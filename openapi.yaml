@@ -93,6 +93,209 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
+  /mensajes-procesados:
+    get:
+      tags:
+        - mensajes
+      operationId: listMensajesProcesados
+      summary: Search processed messages
+      description: Replaces MensajesProcesadosBean.buscarMensajes(). Requires at least one filter (po, vina or fechaDesde) — mirrors the legacy validation.
+      x-source: "MensajesProcesadosBean.buscarMensajes()"
+      x-status: draft
+      x-todo: >-
+        Open question: vina and po filters are validated in the bean but NOT
+        part of the current DAO SQL. Decide whether the new endpoint fixes
+        this or documents it as legacy bug.
+      parameters:
+        - name: po
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: vina
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: fechaDesde
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date
+        - name: fechaHasta
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 0
+        - name: size
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 20
+            maximum: 100
+      responses:
+        "200":
+          description: Processed messages
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MensajeProcesadoPage"
+        "400":
+          description: At least one of po, vina or fechaDesde is required
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: Missing WINE_* permission
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /mensajes-procesados/autocomplete/vinas:
+    get:
+      tags:
+        - mensajes
+      operationId: autocompleteVinas
+      summary: Autocomplete winery (viña) values
+      x-source: "MensajesProcesadosBean.autoCompletarVinas(valor)"
+      x-status: draft
+      x-todo: "Confirm error behavior; the bean captures exceptions and returns null."
+      parameters:
+        - name: q
+          in: query
+          required: true
+          schema:
+            type: string
+            minLength: 1
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 10
+            maximum: 50
+      responses:
+        "200":
+          description: Matching winery values
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/AutocompleteItem"
+        "400":
+          description: Invalid query parameters
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /mensajes-procesados/autocomplete/po:
+    get:
+      tags:
+        - mensajes
+      operationId: autocompletePO
+      summary: Autocomplete PO values
+      description: Uses ajuste_inventario.registro_po as source. See x-todo.
+      x-source: "MensajesProcesadosBean.autocompletarPO(valor)"
+      x-status: draft
+      x-todo: >-
+        Open question: bean reuses listaVinas for PO (naming bug). Also
+        confirm whether the new API should query ajuste_inventario (current)
+        or purchase_order (semantically correct).
+      parameters:
+        - name: q
+          in: query
+          required: true
+          schema:
+            type: string
+            minLength: 1
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 10
+            maximum: 50
+      responses:
+        "200":
+          description: Matching PO values
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/AutocompleteItem"
+        "400":
+          description: Invalid query parameters
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /mensajes-procesados/{id}/txt:
+    get:
+      tags:
+        - mensajes
+      operationId: downloadMensajeTxt
+      summary: Download a processed message as UTF-8 TXT
+      x-source: "MensajesProcesadosBean.descargarTXT(MensajeProcesado)"
+      x-status: draft
+      x-todo: >-
+        Open question: ConectaFtp is injected in the bean but unused; current
+        download reads directly from MensajeProcesado.texto. Confirm whether
+        the new endpoint should proxy an FTP file or keep DB text.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Message text
+          content:
+            text/plain; charset=utf-8:
+              schema:
+                type: string
+        "404":
+          description: Message not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
 
 components:
   securitySchemes:
@@ -173,6 +376,60 @@ components:
                 - WINE_TARJA
                 - WINE_ALMA
               x-todo: "confirm exact permission IDs from Open questions in DESACOPLE.md#login"
+    MensajeProcesado:
+      type: object
+      required:
+        - id
+        - tipo
+        - fecha
+        - texto
+      x-source: "MensajeProcesado entity"
+      x-status: draft
+      x-todo: "Confirm fields against the MensajeProcesado entity."
+      properties:
+        id:
+          type: string
+        tipo:
+          type: string
+        fecha:
+          type: string
+          format: date-time
+        texto:
+          type: string
+          nullable: true
+        po:
+          type: string
+          nullable: true
+        vina:
+          type: string
+          nullable: true
+    MensajeProcesadoPage:
+      allOf:
+        - $ref: "#/components/schemas/Pagination"
+        - type: object
+          required:
+            - content
+          properties:
+            content:
+              type: array
+              items:
+                $ref: "#/components/schemas/MensajeProcesado"
+      x-source: "MensajesProcesadosBean.buscarMensajes()"
+      x-status: draft
+      x-todo: "Confirm page content and pagination fields against MensajesService.buscarMensajesProcesados(...)."
+    AutocompleteItem:
+      type: object
+      required:
+        - value
+      x-source: "ContainerService.consultarListaVinas(valor), ContainerService.consultarListaPOenAjustes(valor)"
+      x-status: draft
+      x-todo: "Confirm autocomplete labels; legacy methods return scalar String values."
+      properties:
+        value:
+          type: string
+        label:
+          type: string
+          nullable: true
     ErrorResponse:
       type: object
       required:
