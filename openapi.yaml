@@ -1,0 +1,91 @@
+openapi: 3.0.3
+
+info:
+  title: wineSystem API
+  version: 1.0.0
+  description: API designed to decouple the legacy JSF UI from the business logic, allowing Angular and Go to replace the system incrementally.
+  x-migration-phase: "phase-2-contracts"
+  x-legacy-system: "wineSystem JSF/Spring/Hibernate"
+  x-target-stack: "Angular + Go"
+
+servers:
+  - url: /api/v1
+    description: Base path for all endpoints (relative, resolved by reverse proxy)
+
+security:
+  - bearerAuth: []
+
+tags:
+  - name: auth
+    description: login / session
+    x-source: "LoginBean (DESACOPLE.md#login)"
+  - name: mensajes
+    description: mensajes procesados / bodega
+    x-source: "MensajesProcesadosBean, MensajeBodegaBean"
+  - name: existencia
+    description: existencia de carga + consulta de etiqueta
+    x-source: "ExistenciaCargaBean, BuscarEtiquetaBean"
+  - name: ubicacion
+    description: reubicacion, asignar ubicacion, ajuste inventario, asignacion
+    x-source: "UbicacionBean, AjusteInventarioBean, AsignacionBean"
+  - name: recepcion
+    description: recepcion axis + manual
+    x-source: "RecepcionBean, RecepcionManualBean, TipoRecepcionBean"
+  - name: consolidado
+    description: tarja + packing list
+    x-source: "ConsolidadoBean, PackingListBean"
+  - name: despacho
+    description: despacho + pt disponibles
+    x-source: "DespachoBean, PtDisponiblesBean"
+  - name: contenedor
+    description: carga de contenedores
+    x-source: "ContenedorBean"
+  - name: facturacion
+    description: resumen de facturacion
+    x-source: "ResumenFacturacionBean"
+  - name: carga-wine
+    description: import de POs desde Excel
+    x-source: "CargaWineBean"
+  - name: manifiesto
+    description: "BLOCKED - do not generate endpoints for this tag yet"
+    x-source: "manifiestoBean, blBean (source missing)"
+
+paths: {}
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    ErrorResponse:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+        details:
+          type: object
+          nullable: true
+          additionalProperties: true
+    Pagination:
+      type: object
+      required:
+        - page
+        - size
+        - totalElements
+        - totalPages
+      properties:
+        page:
+          type: integer
+        size:
+          type: integer
+        totalElements:
+          type: integer
+        totalPages:
+          type: integer
