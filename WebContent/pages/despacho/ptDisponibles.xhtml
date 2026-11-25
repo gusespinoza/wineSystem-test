@@ -1,0 +1,107 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+	xmlns:of="http://omnifaces.org/functions"
+	xmlns:adm="http://github.com/adminfaces">
+<h:head>
+
+</h:head>
+<body>
+	<ui:composition template="/index.xhtml">
+		<ui:define name="content-begin">
+			<div>
+				<ui:insert name="content">
+
+					<h:form id="ptForm">
+						<p:panel id="panelPt" header="Picking Ticket Disponibles"
+							styleClass="card no-border">
+							<f:event type="preRenderView"
+								listener="#{ptDisponiblesBean.onLoad}" />
+								
+							
+								
+							<p:dataTable id="tblPo" var="pt"
+								value="#{ptDisponiblesBean.ptDisponibles}" rowIndexVar="rowId"
+								paginator="true"
+								filteredValue="#{ptDisponiblesBean.ptDisponiblesAux}"
+								emptyMessage="No se encontraron P.T. disponibles para despachar"
+								widgetVar="tblPoWv" style="text-align: center;" rows="30"
+								rowKey="#{pt.id}">
+
+								<f:facet name="header">
+									<p:panelGrid columns="2" styleClass="ui-noborder"
+										id="panelTabla" columnClasses="ui-grid-col-12,ui-grid-col-4"
+										style="height:45px;">
+
+										<p:outputPanel style="text-align: right;">
+											<p:inputText maxlength="35" autocomplete="off"
+												id="globalFilter"
+												onkeypress="if(event.keyCode == 13) return false"
+												placeholder="Buscar..."
+												style="width: 190px;height: 40px;font-size: 16px;">
+												<f:ajax event="keyup" delay="800"
+													onevent="function(data){if(data.status=='success') PF('tblPoWv').filter();}" />
+											</p:inputText>
+										</p:outputPanel>
+									</p:panelGrid>
+								</f:facet>
+
+								<p:column width="20" headerText="#">
+									<p:outputLabel value="#{rowId + 1}" />
+								</p:column>
+								<p:column headerText="PT" width="150" filterBy="#{pt.pt}"
+									filterStyle="display:none" filterMatchMode="contains">
+									<h:outputText value="#{pt.pt}" />
+								</p:column>
+								<p:column headerText="Viña" width="100" filterBy="#{pt.vina}"
+									filterStyle="display:none" filterMatchMode="contains">
+									<h:outputText value="#{pt.vina}" />
+								</p:column>
+								<p:column headerText="Orden Ref." width="100"
+									filterBy="#{pt.orRef}" filterStyle="display:none"
+									filterMatchMode="contains">
+									<h:outputText value="#{pt.orRef}" />
+								</p:column>
+								<p:column headerText="Cod. Producto" width="150"
+									filterBy="#{pt.codProd}" filterStyle="display:none"
+									filterMatchMode="contains">
+									<h:outputText value="#{pt.codProd}" />
+								</p:column>
+								<p:column headerText="Unidades" width="100">
+									<h:outputText value="#{pt.cantidad}" />
+								</p:column>
+								<p:column headerText="Cosecha" width="100"
+									filterBy="#{pt.cosecha}" filterStyle="display:none"
+									filterMatchMode="contains">
+									<h:outputText value="#{pt.cosecha}" />
+								</p:column>
+								<p:column headerText="Anular P.T." width="40">
+									<p:commandLink id="anular"
+										actionListener="#{ptDisponiblesBean.cargarPt(pt)}">
+										<h:graphicImage
+											value="data:image/jpg;base64,#{constantesBean.anular}"
+											width="25" height="25" />
+									</p:commandLink>
+									<p:tooltip for="anular" value="Anular Picking Ticket"></p:tooltip>
+								</p:column>
+							</p:dataTable>
+							
+							<p:remoteCommand name="mod"
+								actionListener="#{ptDisponiblesBean.cancelarPt()}"></p:remoteCommand>
+								
+						</p:panel>
+					</h:form>
+				</ui:insert>
+			</div>
+		</ui:define>
+	</ui:composition>
+</body>
+
+
+
+
+</html>

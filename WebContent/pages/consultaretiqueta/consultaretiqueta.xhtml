@@ -1,0 +1,653 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:of="http://omnifaces.org/functions"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:adm="http://github.com/adminfaces"
+	xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:pe="http://primefaces.org/ui/extensions">
+
+
+<h:head>
+	<title>Marval Wine</title>
+	<link rel="stylesheet" href="style.css"></link>
+
+</h:head>
+
+<h:body id="body">
+
+	<ui:composition template="/index.xhtml">
+
+		<ui:define name="content-begin">
+			<p:ajaxStatus onstart="PF('statusDialog').show();"
+				onsuccess="PF('statusDialog').hide();" />
+
+			<div class="ui-flat">
+
+				<h:form id="formUbicacion">
+
+					<f:event type="preRenderView"
+						listener="#{buscarEtiquetaBean.onLoad()}" />
+
+					<p:panel id="ubicacion" header="Consultar Etiqueta"
+						styleClass="card no-border">
+
+						<p:panelGrid columns="5" layout="grid"
+							columnClasses="ui-grid-col-3,ui-grid-col-3,ui-grid-col-3,ui-grid-col-3,ui-grid-col-3">
+
+							<p:autoComplete maxlength="10" placeholder="ETIQUETA"
+								scrollHeight="200" style="width:100%;"
+								inputStyle="width:100%!important" forceSelection="false"
+								value="#{buscarEtiquetaBean.etiqueta}" minQueryLength="4"
+								completeMethod="#{buscarEtiquetaBean.autoCompletaEtiqueta}"
+								effect="fade" maxResults="5"
+								onkeypress="if(event.which &lt; 48 || event.which &gt; 57 ) if(event.which != 8) return false;"
+								onkeyup="if(event.keyCode != 8 &amp;&amp; value.length == 4) value = value + '-'">
+								<p:ajax event="keyup" global="false" />
+								<p:ajax event="query" global="false" />
+								<p:ajax event="itemSelect" global="false" />
+							</p:autoComplete>
+
+							<p:autoComplete maxlength="30" placeholder="VIÑA"
+								disabled="#{buscarEtiquetaBean.etiqueta ne ''}"
+								scrollHeight="200" style="width:100%;"
+								inputStyle="width:100%!important" forceSelection="false"
+								value="#{buscarEtiquetaBean.vina}" minQueryLength="4"
+								completeMethod="#{buscarEtiquetaBean.autoCompletarVinas}"
+								effect="fade">
+								<p:ajax event="keyup" global="false" />
+								<p:ajax event="query" global="false" />
+								<p:ajax event="itemSelect" global="false" />
+
+							</p:autoComplete>
+
+							<p:selectOneMenu id="tipoDoc"
+								disabled="#{buscarEtiquetaBean.etiqueta ne ''}"
+								value="#{buscarEtiquetaBean.tipoDoc}"
+								placeholder="TIPO DOCUMENTO" style="width:100% !important"
+								inputStyle="width:100%!important">
+								<f:selectItem itemValue="" itemLabel="" />
+								<f:selectItem itemValue="GUIA DESPACHO"
+									itemLabel="GUIA DESPACHO" />
+								<p:ajax event="itemSelect" update="ubicacion"></p:ajax>
+							</p:selectOneMenu>
+
+							<p:inputText id="nrodoc"
+								rendered="#{buscarEtiquetaBean.tipoDoc eq 'GUIA DESPACHO'}"
+								placeholder="NÚMERO DOCUMENTO" style="width: 100%"
+								inputStyle="width: 100%" value="#{buscarEtiquetaBean.numeroDoc}">
+								<p:ajax global="false" update="@this" />
+							</p:inputText>
+							<p:commandButton styleClass="btn btn-success btn-block"
+								id="buscar" process="@this" value="Buscar" icon="fa fa-search"
+								update="ubicacionRes"
+								actionListener="#{buscarEtiquetaBean.buscarEtiqueta()}">
+							</p:commandButton>
+
+						</p:panelGrid>
+
+
+					</p:panel>
+
+					<br></br>
+
+					<p:panel id="ubicacionRes" styleClass="card no-border"
+						visible="#{fn:length(buscarEtiquetaBean.etiquetas) gt 0}">
+
+						<p:dataTable id="tablaCont" widgetVar="tablaContWV"
+							style="text-align: center;" var="cont" rowIndexVar="rowId"
+							paginator="true" editable="true" paginatorPosition="bottom"
+							emptyMessage="No existen cargas para mostrar."
+							filteredValue="#{buscarEtiquetaBean.etiquetasAux}"
+							value="#{buscarEtiquetaBean.etiquetas}" rows="30"
+							selection="#{buscarEtiquetaBean.etiquetasCheck}"
+							rowSelectMode="checkbox" rowKey="#{cont.id}">
+
+							<f:facet name="header">
+								<p:panelGrid columns="4" styleClass="ui-noborder"
+									id="panelTabla"
+									columnClasses="ui-grid-col-6,ui-grid-col-3, ui-grid-col-3 ,ui-grid-col-3"
+									style="height:45px;">
+
+
+
+									<p:outputPanel style="text-align: left;">
+
+										<p:commandButton styleClass="btn-flat btn-warning"
+											process="@this"
+											disabled="#{!(fn:length(buscarEtiquetaBean.etiquetasCheck) gt 0)}"
+											onclick="PF('dlgAnular').show();" value="Anular"
+											icon="fa fa-close" style="width: 200px;">
+										</p:commandButton>
+
+									</p:outputPanel>
+
+									<p:outputLabel></p:outputLabel>
+
+									<p:outputPanel style="text-align: right;">
+										<p:commandButton styleClass="btn-flat btn-success"
+											process="formEtiquetas"
+											disabled="#{!(fn:length(buscarEtiquetaBean.etiquetasCheck) gt 0)}"
+											update="formEtiquetas:dlgeti"
+											oncomplete="PF('dlgEtiquetas').show(); limpiar()"
+											value="Imprimir" icon="fa fa-print" style="width: 200px;">
+										</p:commandButton>
+									</p:outputPanel>
+
+									<p:outputPanel style="text-align: right;">
+										<p:inputText maxlength="35" autocomplete="off"
+											id="globalFilter"
+											onkeypress="if(event.keyCode == 13) return false"
+											placeholder="Buscar..."
+											style="width: 190px;height: 40px;font-size: 16px;">
+											<f:ajax event="keyup" delay="800"
+												onevent="function(data){if(data.status=='success') PF('tablaContWV').filter();}" />
+										</p:inputText>
+									</p:outputPanel>
+								</p:panelGrid>
+							</f:facet>
+
+							<p:ajax event="cellEdit" global="false" partialSubmit="true" />
+							<p:ajax event="toggleSelect" global="false" partialSubmit="true"
+								update="tablaCont" />
+							<p:ajax event="rowSelectCheckbox" global="false"
+								partialSubmit="true" update="tablaCont" />
+							<p:ajax event="rowUnselectCheckbox" global="false"
+								partialSubmit="true" update="tablaCont" />
+
+							<p:column selectionMode="multiple"
+								style="width:15px;text-align:center">
+							</p:column>
+
+							<p:column width="20" headerText="#">
+								<p:outputLabel value="#{rowId + 1}" />
+							</p:column>
+
+							<p:column width="70" headerText="ETIQUETA"
+								filterBy="#{cont.etiqueta}" filterStyle="display:none"
+								filterMatchMode="contains">
+								<p:outputLabel value="#{cont.etiqueta}" />
+							</p:column>
+
+							<p:column width="120" headerText="VIÑA">
+								<p:outputLabel value="#{cont.vina}" />
+							</p:column>
+
+							<p:column width="150" headerText="PRODUCTO">
+								<p:outputLabel value="#{cont.producto}" />
+							</p:column>
+
+							<p:column width="70" headerText="CÓD PRODUCTO"
+								filterBy="#{cont.codProducto}" filterStyle="display:none"
+								filterMatchMode="contains">
+								<p:outputLabel value="#{cont.codProducto}" />
+							</p:column>
+
+							<p:column width="60" headerText="FERT">
+								<p:outputLabel value="#{cont.fert}" />
+							</p:column>
+
+							<p:column width="60" headerText="NRO GUÍA"
+								filterBy="#{cont.nroDoc}" filterStyle="display:none"
+								filterMatchMode="contains">
+								<p:outputLabel
+									value="#{(cont.tipoDoc eq 'GUIA DESPACHO')? cont.nroDoc : ''}" />
+							</p:column>
+
+							<p:column width="60" headerText="CAJAS / PALLET">
+								<p:outputLabel value="#{cont.cajasPorPalet}" />
+							</p:column>
+
+						</p:dataTable>
+
+
+
+					</p:panel>
+
+
+					<p:remoteCommand name="confirmarCheck"
+						action="#{buscarEtiquetaBean.cancelarEtiquetasCheck()}"
+						update="@form" process="@this"></p:remoteCommand>
+					<p:remoteCommand name="limpiar"
+						action="#{buscarEtiquetaBean.etiquetasCheck.clear()}"
+						update="@form" process="@this"></p:remoteCommand>
+
+
+
+					<p:dialog widgetVar="dlgEtiqueta" modal="true" draggable="false"
+						id="etiDlg" showHeader="false" closeOnEscape="true"
+						position="center center" style="background-color:#F0F0F0;"
+						onShow="PF('dlgEtiqueta').initPosition();" hideEffect="fade"
+						styleClass="box-success" showEffect="fade" resizable="false"
+						minHeight="150" width="41%">
+
+						<p:panel id="paneleti" styleClass="card no-border"
+							visible="#{buscarEtiquetaBean.etiquetaData.etiqueta ne null}">
+
+							<p:panel id="etiqueta" styleClass="card no-border">
+
+								<p:outputPanel style="text-align: center;">
+									<p:barcode value="0123456789" type="qr" width="180"
+										height="180" />
+								</p:outputPanel>
+
+								<p:spacer height="3"></p:spacer>
+
+								<table style="width: 100%; line-height: 25px;">
+									<tr>
+										<th style="width: 18%;"><p:outputLabel value="Etiqueta:" /></th>
+										<th style="width: 32%;"><p:outputLabel
+												value="Posición actual:" /></th>
+										<th style="width: 25%;"><p:outputLabel
+												value="Estado del bulto:" /></th>
+										<th style="width: 25%;"><p:outputLabel
+												value="Repaletizado:" /></th>
+									</tr>
+
+									<tr>
+										<td><p:outputLabel
+												style="font-weight:bold; font-size: 22px; "
+												value="#{buscarEtiquetaBean.etiquetaData.etiqueta}" /></td>
+										<td><p:outputLabel
+												style="font-weight:bold; font-size: 22px; "
+												value="Pas #{buscarEtiquetaBean.etiquetaData.pasillo} - 
+										Alt #{buscarEtiquetaBean.etiquetaData.altura} - 
+										Pos #{buscarEtiquetaBean.etiquetaData.posicion}" /></td>
+										<td><p:outputLabel
+												style="font-weight:bold; font-size: 22px; "
+												value="#{buscarEtiquetaBean.etiquetaData.estadoEt}" /></td>
+										<td><p:outputLabel
+												style="font-weight:bold; font-size: 22px; "
+												value="#{(buscarEtiquetaBean.etiquetaData.repaletizado ne null ) ? buscarEtiquetaBean.etiquetaData.repaletizado : 'No'}" /></td>
+									</tr>
+								</table>
+
+								<hr />
+								<p:spacer height="5"></p:spacer>
+
+								<table style="width: 100%; line-height: 30px;">
+									<tr>
+										<th style="width: 25%;"><p:outputLabel value="P.O.:" /></th>
+										<th style="width: 25%;"><p:outputLabel
+												style="font-size: 15px; line-height: 1;width: 100%;"
+												value="#{buscarEtiquetaBean.etiquetaData.poId}" /></th>
+
+										<th style="width: 25%;"><p:outputLabel value="Owner Id:" /></th>
+										<th style="width: 25%;"><p:outputLabel
+												style=" font-size: 15px; line-height: 1;width: 100%;"
+												value="#{buscarEtiquetaBean.etiquetaData.vina}" /></th>
+									</tr>
+
+									<tr>
+
+
+										<th style="width: 25%;"><p:outputLabel value="Producto:" /></th>
+										<th style="width: 25%;"><p:outputLabel
+												style=" font-size: 15px; line-height: 1;width: 100%;"
+												value="#{buscarEtiquetaBean.etiquetaData.producto}" /></th>
+
+										<th style="width: 25%;"><p:outputLabel value="Código:" /></th>
+										<th style="width: 25%;"><p:outputLabel
+												style=" font-size: 15px; line-height: 1;width: 100%;"
+												value="#{buscarEtiquetaBean.etiquetaData.codProducto}" /></th>
+									</tr>
+
+
+									<tr>
+
+
+										<th style="width: 25%;"><p:outputLabel
+												value="Botellas / Caja:" /></th>
+										<th style="width: 25%;"><p:outputLabel
+												style=" font-size: 15px; line-height: 1;width: 100%;"
+												value="#{buscarEtiquetaBean.etiquetaData.botellasPorCaja}" /></th>
+
+										<th style="width: 25%;"><p:outputLabel value="Recepción:" /></th>
+										<th style="width: 25%;"><p:outputLabel
+												style=" font-size: 15px; line-height: 1;width: 100%;"
+												value="#{of:formatDate(buscarEtiquetaBean.etiquetaData.recepcion, 'dd-MM-yyyy')}" />
+										</th>
+									</tr>
+
+									<tr>
+
+
+										<th style="width: 25%;"><p:outputLabel
+												value="Cajas por Pallet:" /></th>
+										<th style="width: 25%;"><p:outputLabel
+												style=" font-size: 15px; line-height: 1;width: 100%;"
+												value="#{buscarEtiquetaBean.etiquetaData.cajasPorPalet}" /></th>
+
+										<th style="width: 25%;"><p:outputLabel value="Cosecha:" /></th>
+										<th style="width: 25%;"><p:outputLabel
+												style=" font-size: 15px; line-height: 1;width: 100%;"
+												value="#{buscarEtiquetaBean.etiquetaData.cosecha}" /></th>
+									</tr>
+
+									<tr>
+
+
+										<th style="width: 25%;"><p:outputLabel value="Cc:" /></th>
+										<th style="width: 25%;"><p:outputLabel
+												style=" font-size: 15px; line-height: 1;width: 100%;"
+												value="#{buscarEtiquetaBean.etiquetaData.capacidadEnCc}" /></th>
+
+										<th style="width: 25%;"><p:outputLabel value="Lote:" /></th>
+										<th style="width: 25%;"><p:outputLabel
+												style=" font-size: 15px; line-height: 1;width: 100%;"
+												value="#{buscarEtiquetaBean.etiquetaData.lote}" /></th>
+									</tr>
+								</table>
+
+
+
+							</p:panel>
+
+							<p:spacer height="10"></p:spacer>
+
+							<p:outputPanel style="text-align: right;">
+								<p:commandButton styleClass="btn-flat btn-success"
+									value="Imprimir" icon="fa fa-print" style="width: 200px;">
+									<p:printer target="etiqueta" />
+								</p:commandButton>
+								<p:commandButton styleClass="btn-flat btn-warning"
+									oncomplete="PF('dlgAnular').show();" value="Anular"
+									icon="fa fa-close" style="width: 200px;">
+
+								</p:commandButton>
+							</p:outputPanel>
+
+						</p:panel>
+
+					</p:dialog>
+
+
+
+
+					<p:remoteCommand name="confirmar" update="@form"
+						action="#{buscarEtiquetaBean.cancelarEtiqueta()}" />
+
+					<p:dialog widgetVar="dlgAnular" modal="true" draggable="false"
+						id="editarUsuarioIdSec" showHeader="false" closeOnEscape="true"
+						position="center center" style="background-color:#F0F0F0;"
+						onShow="PF('dlgAnular').initPosition();" hideEffect="fade"
+						styleClass="box-success" showEffect="fade" resizable="false"
+						minHeight="150" width="31%">
+
+						<p:panel styleClass="card no-border" id="panelRepaletizadoSec"
+							header="Anular etiquetas">
+
+
+							<p:panelGrid columns="1" id="panelEtiqSel2"
+								columnClasses="ui-grid-col-12" layout="grid">
+								<p:selectOneMenu id="motivo"
+									value="#{buscarEtiquetaBean.motivoAnulacion}"
+									style="width:100% !important" inputStyle="width:100%!important">
+									<f:selectItem itemValue="" itemLabel="MOTIVO ANULACIÓN" />
+									<f:selectItem itemValue="CUADRATURA" itemLabel="CUADRATURA" />
+									<f:selectItem itemValue="DAÑO" itemLabel="DAÑO" />
+									<f:selectItem itemValue="AJUSTE DE INVENTARIO"
+										itemLabel="AJUSTE DE INVENTARIO" />
+									<f:selectItem itemValue="DESPACHO" itemLabel="DESPACHO" />
+									<p:ajax event="change" process="@this"></p:ajax>
+								</p:selectOneMenu>
+
+							</p:panelGrid>
+							<br />
+							<br />
+							<p:outputPanel style="text-align: right;">
+								<p:commandButton styleClass="btn btn-flat btn-warning"
+									value="Anular" icon="fa fa-fw fa-check" global="false"
+									actionListener="#{buscarEtiquetaBean.confirmarAnulacion()}"
+									style="width: 200px;height: 35px;" id="btnGuardar">
+								</p:commandButton>
+								&nbsp;
+								<p:commandButton styleClass="btn" value="Cancelar"
+									icon="fa fa-close" global="false"
+									onclick="PF('dlgAnular').hide();habilitarScroll();"
+									style="width: 200px;height: 35px;" id="btnVolverEditSec">
+								</p:commandButton>
+							</p:outputPanel>
+
+						</p:panel>
+					</p:dialog>
+
+
+
+				</h:form>
+
+				<h:form id="formEtiquetas">
+
+					<p:dialog id="dlgeti" widgetVar="dlgEtiquetas" modal="true"
+						draggable="false" closeOnEscape="true" position="center center"
+						showHeader="false" hideEffect="fade" showEffect="fade"
+						resizable="false" height="700px" width="85%" closable="false"
+						onShow="PF('dlgEtiquetas').initPosition();"
+						style="background-color:#F0F0F0;" styleClass="box-success">
+
+						<div class="ui-flat">
+
+							<p:panel id="etiquetas" styleClass="card no-border">
+
+								<p:repeat var="eti" value="#{buscarEtiquetaBean.etiquetasCheck}">
+
+									<p:panel id="etiqueta#{eti.id}" styleClass="card no-border">
+
+										<p:outputPanel style="text-align: center;">
+											<p:barcode value="#{eti.qr}" type="qr" width="180"
+												height="180" />
+										</p:outputPanel>
+
+										<p:spacer height="3"></p:spacer>
+
+										<table style="width: 100%; line-height: 25px;">
+											<tr>
+												<th style="width: 18%;"><p:outputLabel
+														value="Etiqueta:" /></th>
+												<th style="width: 25%;"><p:outputLabel
+														value="Posición actual:" /></th>
+												<th style="width: 18%;"><p:outputLabel
+														value="Estado del bulto:" /></th>
+												<th style="width: 15%;"><p:outputLabel
+														value="Repaletizado:" /></th>
+												<th style="width: 13%;"><p:outputLabel value="FERT:" /></th>
+												<th style="width: 13%;"><p:outputLabel
+														value="Cajas/Pallet:" /></th>
+											</tr>
+											<tr>
+												<td><p:outputLabel
+														style="font-weight:bold; font-size: 22px; "
+														value="#{eti.etiqueta}" /></td>
+												<td><p:outputLabel
+														rendered="#{eti.estadoEt eq 'ALMACENADA'}"
+														style="font-weight:bold; font-size: 22px; "
+														value="Pas #{eti.pasillo} - Pos #{eti.posicion} - Alt #{eti.altura} " /></td>
+												<td><p:outputLabel
+														style="font-weight:bold; font-size: 22px; margin-right: 10px;"
+														value="#{eti.estadoEt}" /></td>
+												<td><p:outputLabel
+														style="font-weight:bold; font-size: 22px; margin-right: 10px; "
+														value="#{(eti.repaletizado.contains('/')) ? 'Si' : 'No'}" /></td>
+												<td><p:outputLabel
+														style="font-weight:bold; font-size: 22px;"
+														value="#{eti.fert}" /></td>
+												<td><p:outputLabel
+														style="font-weight:bold; font-size: 22px; argin-right: 10px; "
+														value="#{eti.cajasPorPalet}" /></td>
+											</tr>
+										</table>
+
+										<hr />
+										<p:spacer height="5"></p:spacer>
+
+										<table style="width: 100%; line-height: 30px;">
+											<tr>
+												<th style="width: 25%;"><p:outputLabel value="P.O.:" /></th>
+												<th style="width: 25%;"><p:outputLabel
+														style="font-size: 15px; line-height: 1;width: 100%;"
+														value="#{eti.podId}" /></th>
+
+												<th style="width: 25%;"><p:outputLabel
+														value="Owner Id:" /></th>
+												<th style="width: 25%;"><p:outputLabel
+														style=" font-size: 15px; line-height: 1;width: 100%;"
+														value="#{eti.ownerId}" /></th>
+											</tr>
+
+											<tr>
+
+
+												<th style="width: 25%;"><p:outputLabel
+														value="Producto:" /></th>
+												<th style="width: 25%;"><p:outputLabel
+														style="font-weight:bold; font-size: 18px; line-height: 1;width: 100%;"
+														value="#{eti.producto}" /></th>
+
+												<th style="width: 25%;"><p:outputLabel value="Código:" /></th>
+												<th style="width: 25%;"><p:outputLabel
+														style=" font-size: 15px; line-height: 1;width: 100%;"
+														value="#{eti.codProducto}" /></th>
+											</tr>
+
+											<tr>
+
+												<th style="width: 25%;"><p:outputLabel
+														value="Botellas / Caja:" /></th>
+												<th style="width: 25%;"><p:outputLabel
+														style=" font-size: 15px; line-height: 1;width: 100%;"
+														value="#{eti.botellasPorCaja}" /></th>
+
+												<th style="width: 25%;"><p:outputLabel
+														value="Recepción:" /></th>
+												<th style="width: 25%;"><p:outputLabel
+														style=" font-size: 15px; line-height: 1;width: 100%;"
+														value="#{of:formatDate(eti.fechaRecepcion, 'dd-MM-yyyy')}" />
+												</th>
+											</tr>
+
+											<tr>
+
+
+												<th style="width: 25%;"><p:outputLabel
+														value="Cajas por Pallet:" /></th>
+												<th style="width: 25%;"><p:outputLabel
+														style=" font-weight:bold; font-size: 18px; line-height: 1;width: 100%"
+														value="#{eti.cajasPorPalet}" /></th>
+
+												<th style="width: 25%;"><p:outputLabel value="Cosecha:" /></th>
+												<th style="width: 25%;"><p:outputLabel
+														style=" font-size: 15px; line-height: 1;width: 100%;"
+														value="#{eti.cosecha}" /></th>
+											</tr>
+
+											<tr>
+												<th style="width: 25%;"><p:outputLabel value="Cc:" /></th>
+												<th style="width: 25%;"><p:outputLabel
+														style=" font-size: 15px; line-height: 1;width: 100%;"
+														value="#{eti.capacidadEnCc}" /></th>
+
+												<th style="width: 25%;"><p:outputLabel value="Lote:" /></th>
+												<th style="width: 25%;"><p:outputLabel
+														style="font-weight:bold; font-size: 18px; line-height: 1;width: 100%"
+														value="#{eti.lote}" /></th>
+											</tr>
+										</table>
+
+									</p:panel>
+
+									<p:spacer height="40"></p:spacer>
+
+								</p:repeat>
+							</p:panel>
+
+							<p:spacer height="20"></p:spacer>
+
+							<p:outputPanel style="text-align: right;">
+								<p:commandButton styleClass="btn-flat btn-success"
+									value="Imprimir" icon="fa fa-print" style="width: 200px;">
+									<p:printer target="etiquetas" />
+								</p:commandButton>
+								<p:commandButton styleClass="btn-flat" update="@form"
+									onclick="PF('dlgEtiquetas').hide();" value="Cancelar"
+									icon="fa fa-close" style="width: 200px;">
+
+								</p:commandButton>
+							</p:outputPanel>
+
+						</div>
+
+					</p:dialog>
+
+
+
+
+					<p:dialog widgetVar="rf" modal="true" draggable="false"
+						closeOnEscape="true" position="center center" showHeader="false"
+						hideEffect="fade" showEffect="fade" resizable="false"
+						height="auto" width="80%" closable="false"
+						onShow="PF('rf').initPosition();"
+						style="background-color:#F0F0F0;" styleClass="box-success">
+						<div class="ui-flat">
+							<p:panel header="#{ajusteInventarioBean.poSel.producto}"
+								styleClass="card no-border" id="rfPanel">
+
+								<p:panelGrid columns="3" layout="grid"
+									columnClasses="ui-grid-col-4,ui-grid-col-4,ui-grid-col-4">
+
+									<p:inputNumber decimalPlaces="0" placeholder="CANTIDAD"
+										style="width:100%;" inputStyle="width:100%;"
+										value="#{ajusteInventarioBean.poSel.cantidad}" />
+
+									<p:selectOneMenu id="tipo"
+										value="#{ajusteInventarioBean.poSel.tipoAjuste}"
+										style="width:100% !important"
+										inputStyle="width:100%!important">
+										<f:selectItem itemValue="" itemLabel="TIPO AJUSTE +/-" />
+										<f:selectItem itemValue="+" itemLabel="+" />
+										<f:selectItem itemValue="-" itemLabel="-" />
+										<p:ajax event="change" process="@this"></p:ajax>
+									</p:selectOneMenu>
+
+									<p:selectOneMenu id="motivo"
+										value="#{ajusteInventarioBean.poSel.motivo}"
+										style="width:100% !important"
+										inputStyle="width:100%!important">
+										<f:selectItem itemValue="" itemLabel="MOTIVO AJUSTE" />
+										<f:selectItem itemValue="CUADRATURA" itemLabel="CUADRATURA" />
+										<f:selectItem itemValue="DAÑO" itemLabel="DAÑO" />
+										<f:selectItem itemValue="DESPACHO" itemLabel="DESPACHO" />
+										<p:ajax event="change" process="@this"></p:ajax>
+									</p:selectOneMenu>
+									<h:outputLabel value="" />
+
+									<p:commandButton styleClass="btn-flat btn-success"
+										style="width:100%;"
+										actionListener="#{ajusteInventarioBean.confirmarAjuste()}"
+										id="confirmar" value="Confirmar Ajuste"
+										icon="fa fa-fw fa-check">
+									</p:commandButton>
+
+									<p:commandButton styleClass="btn-flat" style="width:100%;"
+										id="can" value="Cancelar"
+										onclick="PF('rf').hide();habilitarScroll();"
+										icon="fa fa-close">
+									</p:commandButton>
+								</p:panelGrid>
+
+
+							</p:panel>
+						</div>
+					</p:dialog>
+
+				</h:form>
+			</div>
+
+		</ui:define>
+	</ui:composition>
+
+
+</h:body>
+</html>

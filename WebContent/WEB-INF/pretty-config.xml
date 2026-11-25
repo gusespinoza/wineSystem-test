@@ -1,0 +1,123 @@
+<pretty-config
+	xmlns="http://ocpsoft.org/schema/rewrite-config-prettyfaces"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://ocpsoft.org/schema/rewrite-config-prettyfaces">
+
+	<url-mapping id="login">
+		<pattern value="/" />
+		<view-id value="/login.xhtml" />
+	</url-mapping>
+
+	<url-mapping id="ini">
+		<pattern value="/inicio" />
+		<view-id value="/index.xhtml" />
+	</url-mapping>
+
+	<url-mapping id="reubicacion">
+		<pattern value="/reubicacion" />
+		<view-id value="/pages/ubicacion/reubicacion.xhtml" />
+	</url-mapping>
+
+	<url-mapping id="asigubicacion">
+		<pattern value="/asigubicacion" />
+		<view-id value="/pages/ubicacion/asignarubicacion.xhtml" />
+	</url-mapping>
+
+	<url-mapping id="recepcion">
+		<pattern value="/recepcion" />
+		<view-id value="/pages/recepcion/tipoRecepcion.xhtml" />
+	</url-mapping>
+	<url-mapping id="recepcionAxis">
+		<pattern value="/recepcionAxis" />
+		<view-id value="/pages/recepcion/recepcionAxis.xhtml" />
+	</url-mapping>
+	<url-mapping id="recepcionManual">
+		<pattern value="/recepcionManual" />
+		<view-id value="/pages/recepcion/recepcionManual.xhtml" />
+	</url-mapping>
+
+	<url-mapping id="cargarContenedor">
+		<pattern value="/cargaContenedor" />
+		<view-id value="/pages/contenedor/cargaContenedores.xhtml" />
+	</url-mapping>
+
+	<url-mapping id="asignacion">
+		<pattern value="/asignacion" />
+		<view-id value="/pages/asignacion/asignacion.xhtml" />
+	</url-mapping>
+
+	<url-mapping id="tarja">
+		<pattern value="/tarja" />
+		<view-id value="/pages/consolidado/tarja.xhtml" />
+	</url-mapping>
+	<url-mapping id="consolidado">
+		<pattern value="/consolidado" />
+		<view-id value="/pages/consolidado/consolidado.xhtml" />
+	</url-mapping>
+
+
+
+	<url-mapping id="buscarEtiqueta">
+		<pattern value="/buscarEtiqueta" />
+		<view-id
+			value="/pages/consultaretiqueta/consultaretiqueta.xhtml" />
+	</url-mapping>
+
+	<url-mapping id="ajusteInventario">
+		<pattern value="/ajusteInventario" />
+		<view-id value="/pages/ubicacion/ajustarinventario.xhtml" />
+	</url-mapping>
+
+	<url-mapping id="existenciaCarga">
+		<pattern value="/existenciaCarga" />
+		<view-id value="/pages/existenciacarga/existenciacarga.xhtml" />
+	</url-mapping>
+
+	<url-mapping id="repaletizado">
+		<pattern value="/repaletizado" />
+		<view-id value="/pages/repaletizado/repaletizado.xhtml" />
+	</url-mapping>
+
+	<url-mapping id="resumenFacturacion">
+		<pattern value="/resumenFacturacion" />
+		<view-id
+			value="/pages/resumenfacturacion/resumenfacturacion.xhtml" />
+	</url-mapping>
+
+	<url-mapping id="mensajesProcesados">
+		<pattern value="/mensajesProcesados" />
+		<view-id
+			value="/pages/mensajesprocesados/mensajesprocesados.xhtml" />
+	</url-mapping>
+
+	<url-mapping id="mensajeBodega">
+		<pattern value="/mensajeBodega" />
+		<view-id value="/pages/mensajesprocesados/mensajeBodega.xhtml" />
+	</url-mapping>
+
+	<url-mapping id="despacho">
+		<pattern value="/despacho" />
+		<view-id value="/pages/despacho/despacho.xhtml" />
+	</url-mapping>
+
+	<url-mapping id="ptDisponible">
+		<pattern value="/ptDisponibles" />
+		<view-id value="/pages/despacho/ptDisponibles.xhtml" />
+	</url-mapping>
+
+	<url-mapping id="contenedor">
+		<pattern value="/contenedor" />
+		<view-id value="/pages/despacho/listaContenedorDespacho.xhtml" />
+	</url-mapping>
+	
+	<url-mapping id="packingList">
+		<pattern value="/packingList" />
+		<view-id value="/pages/consolidado/packingList.xhtml" />
+	</url-mapping>
+	
+	<url-mapping id="cargaWine">
+		<pattern value="/cargaWine" />
+		<view-id value="/pages/cargaWine/cargaWine.xhtml" />
+	</url-mapping>
+
+</pretty-config>

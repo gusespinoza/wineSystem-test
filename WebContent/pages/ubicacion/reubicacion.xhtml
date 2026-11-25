@@ -1,0 +1,211 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:of="http://omnifaces.org/functions"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:adm="http://github.com/adminfaces"
+	xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:pe="http://primefaces.org/ui/extensions">
+
+
+<h:head>
+	<title>Marval AEP</title>
+	<link rel="stylesheet" href="style.css"></link>
+
+</h:head>
+
+<h:body id="body">
+
+	<ui:composition template="/index.xhtml">
+
+		<ui:define name="content-begin">
+			<p:ajaxStatus onstart="PF('statusDialog').show();"
+				onsuccess="PF('statusDialog').hide();" />
+
+			<div class="ui-flat">
+
+				<h:form id="formUbicacion">
+
+					<f:event type="preRenderView" listener="#{ubicacionBean.onLoad()}" />
+
+					<p:panel id="ubicacion" header="Reubicar Etiqueta"
+						styleClass="card no-border">
+
+						<p:panelGrid columns="3" layout="grid"
+							columnClasses="ui-grid-col-3,ui-grid-col-3,ui-grid-col-3">
+
+							<p:autoComplete maxlength="10" placeholder="ETIQUETA"
+								scrollHeight="200" style="width:100%;"
+								inputStyle="width:100%!important" forceSelection="true"
+								value="#{ubicacionBean.etiqueta}" minQueryLength="4"
+								completeMethod="#{ubicacionBean.autoCompletaEtiquetaAlm}"
+								onkeypress="if(event.which &lt; 48 || event.which &gt; 57 ) if(event.which != 8) return false;"
+								onkeyup="if(event.keyCode != 8 &amp;&amp; value.length == 4) value = value + '-'"
+								effect="fade">
+								<p:ajax event="keyup" global="false" />
+								<p:ajax event="query" global="false" />
+								<p:ajax event="itemSelect" global="false" />
+							</p:autoComplete>
+
+							<p:commandButton styleClass="btn btn-success btn-block"
+								id="buscar" process="@this" value="Buscar" icon="fa fa-search"
+								update="panel4" actionListener="#{ubicacionBean.buscar()}">
+							</p:commandButton>
+
+						</p:panelGrid>
+
+
+					</p:panel>
+
+					<br></br>
+
+
+					<p:panel id="panel4" header="Contenedores Cargados"
+						visible="#{fn:length(ubicacionBean.listaEtiquetas) gt 0}"
+						styleClass="card no-border">
+
+						<p:dataTable id="tablaCont" widgetVar="tablaContWV"
+							style="text-align: center;" var="cont" rowIndexVar="rowId"
+							paginator="false" editable="true"
+							emptyMessage="No existen etiquetas para mostrar."
+							value="#{ubicacionBean.listaEtiquetas}" rows="30">
+
+							<p:ajax event="rowEdit" global="false"
+								listener="#{ubicacionBean.modificarUbicacion}" />
+							<p:ajax event="rowEditCancel" global="false" />
+
+							<p:column width="40" headerText="#">
+								<p:outputLabel value="#{rowId + 1}" />
+							</p:column>
+
+							<p:column filterBy="#{cont.etiqueta}" headerText="Etiqueta"
+								width="120" filterStyle="display:none"
+								filterMatchMode="contains">
+								<p:outputLabel
+									style="font-weight: 700;font-size: 15px;line-height: 1.0;"
+									value="#{cont.etiqueta}" />
+							</p:column>
+
+
+							<p:column filterBy="#{cont.vina}" headerText="Viña" width="120"
+								filterStyle="display:none" filterMatchMode="contains">
+								<p:outputLabel
+									style="font-weight: 700;font-size: 15px;line-height: 1.0;"
+									value="#{cont.vina}" />
+							</p:column>
+							<p:column filterBy="#{cont.producto}" headerText="Producto"
+								width="100" filterStyle="display:none"
+								filterMatchMode="contains">
+								<p:outputLabel
+									style="font-weight: 700;font-size: 15px;line-height: 1.0;"
+									value="#{cont.producto}" />
+							</p:column>
+							<p:column filterBy="#{cont.pasillo}" headerText="Pasillo"
+								width="50" filterStyle="display:none" filterMatchMode="contains">
+
+								<p:cellEditor>
+									<f:facet name="output">
+										<p:outputLabel
+											style="font-weight: 700;font-size: 15px;line-height: 1.0;"
+											value="#{cont.pasillo}" />
+									</f:facet>
+									<f:facet name="input">
+										<p:selectOneMenu id="pasill" value="#{cont.pasillo}" filter="true"
+											effect="fade" style="width:100%!important"
+											onkeyup="value=value.toUpperCase()">
+											<f:selectItem itemLabel="12" itemValue="12" />
+											<f:selectItem itemLabel="13" itemValue="13" />
+											<f:selectItem itemLabel="14" itemValue="14" />
+											<f:selectItem itemLabel="15" itemValue="15" />
+											<f:selectItem itemLabel="16" itemValue="16" />
+											<f:selectItem itemLabel="17" itemValue="17" />
+											<f:selectItem itemLabel="18" itemValue="18" />
+											<f:selectItem itemLabel="19" itemValue="19" />
+											<f:selectItem itemLabel="20" itemValue="20" />
+											<f:selectItem itemLabel="21" itemValue="21" />
+											<f:selectItem itemLabel="22" itemValue="22" />
+											<f:selectItem itemLabel="23" itemValue="23" />
+											<f:selectItem itemLabel="24" itemValue="24" />
+											<f:selectItem itemLabel="25" itemValue="25" />
+											<f:selectItem itemLabel="26" itemValue="26" />
+											<f:selectItem itemLabel="27" itemValue="27" />
+											<f:selectItem itemLabel="28" itemValue="28" />
+											<f:selectItem itemLabel="29" itemValue="29" />
+											<f:selectItem itemLabel="30" itemValue="30" />
+											<f:selectItem itemLabel="31" itemValue="31" />
+											<f:selectItem itemLabel="32" itemValue="32" />
+											<f:selectItem itemLabel="33" itemValue="33" />
+											<f:selectItem itemLabel="34" itemValue="34" />
+											<f:selectItem itemLabel="35" itemValue="35" />
+											<f:selectItem itemLabel="36" itemValue="36" />
+											<f:selectItem itemLabel="37" itemValue="37" />
+											<f:selectItem itemLabel="38" itemValue="38" />
+											<f:selectItem itemLabel="39" itemValue="39" />
+											<p:ajax event="change" global="false" />
+										</p:selectOneMenu>
+									</f:facet>
+								</p:cellEditor>
+							</p:column>
+							
+								<p:column filterBy="#{cont.posicion}" headerText="Posición"
+								width="50" filterStyle="display:none" filterMatchMode="contains">
+								<p:cellEditor>
+									<f:facet name="output">
+										<p:outputLabel
+											style="font-weight: 700;font-size: 15px;line-height: 1.0;"
+											value="#{cont.posicion}" />
+									</f:facet>
+									<f:facet name="input">
+										<p:inputText
+											style="font-weight: 700;font-size: 15px;line-height: 1.0;"
+											value="#{cont.posicion}" />
+									</f:facet>
+								</p:cellEditor>
+							</p:column>
+
+							<p:column filterBy="#{cont.altura}" headerText="Altura"
+								width="50" filterStyle="display:none" filterMatchMode="contains">
+								<p:cellEditor>
+									<f:facet name="output">
+										<p:outputLabel
+											style="font-weight: 700;font-size: 15px;line-height: 1.0;"
+											value="#{cont.altura}" />
+									</f:facet>
+									<f:facet name="input">
+										<p:selectOneMenu id="altura" value="#{cont.altura}" filter="yes"
+											effect="fade" style="width:100%!important"
+											onkeyup="value=value.toUpperCase()">
+											<f:selectItem itemLabel="1" itemValue="1" />
+											<f:selectItem itemLabel="2" itemValue="2" />
+											<f:selectItem itemLabel="3" itemValue="3" />
+											<f:selectItem itemLabel="4" itemValue="4" />
+										</p:selectOneMenu>
+
+									</f:facet>
+								</p:cellEditor>
+							</p:column>
+						
+
+
+							<p:column width="30">
+								<p:rowEditor />
+							</p:column>
+
+
+						</p:dataTable>
+
+					</p:panel>
+
+
+				</h:form>
+			</div>
+
+		</ui:define>
+	</ui:composition>
+
+
+</h:body>
+</html>

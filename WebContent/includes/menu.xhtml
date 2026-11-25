@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+
+	<style type="text/css">
+@
+-moz-document url-prefix () {li span.label-danger { margin-top:-20px;
+	
+}
+
+}
+.swal2-popup {
+	font-size: 1.7rem !important;
+}
+</style>
+	<script src="#{resource['js/sweetalert2.all.min.js']}"></script>
+	<script src="#{resource['js/push.min.js']}"></script>
+	<script src="#{resource['js/aepJS.js']}"></script>
+	<ul class="sidebar-menu tree" data-widget="tree">
+
+		<li class="treeview"><a href="#"
+			style="display: #{(!loginBean.menuRecepcion) ? 'none' : 'block'}">
+				<i class="fa fa-codepen"></i> <span>Recepción</span> <span
+				class="pull-right-container"> <i
+					class="fa fa-angle-left pull-right"></i>
+			</span>
+		</a>
+			<ul class="treeview-menu">
+				<li><p:link href="#{request.contextPath}/recepcionAxis"
+						rendered="#{loginBean.menuRecepcion}">
+						<i class="fa fa-linode"></i>
+						<span>Recepción Axis</span>
+					</p:link></li>
+				<li><p:link href="#{request.contextPath}/recepcionManual"
+						rendered="#{loginBean.menuRecepcionManual}">
+						<i class="fa fa-pencil-square-o"></i>
+						<span>Recepción Manual</span>
+					</p:link></li>
+			</ul></li>
+		<li class="treeview"><a href="#"
+			style="display: #{(!loginBean.menuUbicacion) ? 'none' : 'block'}">
+				<i class="fa fa-codepen"></i> <span>Ubicación</span> <span
+				class="pull-right-container"> <i
+					class="fa fa-angle-left pull-right"></i>
+			</span>
+		</a>
+			<ul class="treeview-menu">
+				<li><p:link href="#{request.contextPath}/asigubicacion"
+						rendered="#{loginBean.menuUbicacion}">
+						<i class="fa fa-linode"></i>
+						<span>Asignar ubicación</span>
+					</p:link></li>
+				<li><p:link href="#{request.contextPath}/reubicacion"
+						rendered="#{loginBean.menuUbicacion}">
+						<i class="fa fa-pencil-square-o"></i>
+						<span>Reubicar</span>
+					</p:link></li>
+			</ul></li>
+		<li><p:link href="#{request.contextPath}/cargaContenedor"
+				rendered="#{loginBean.menuProgramacion}">
+				<i class="fa fa-file-excel-o"></i>
+				<span>Programación Contenedor</span>
+			</p:link></li>
+		<li><p:link href="#{request.contextPath}/asignacion"
+				rendered="#{loginBean.menuAsignacion}">
+				<i class="fa fa-cube"></i>
+				<span>Asignación</span>
+			</p:link></li>
+		<li><p:link href="#{request.contextPath}/tarja"
+				rendered="#{loginBean.menuDesconsolidado}">
+				<i class="fa fa-cubes"></i>
+				<span>Consolidado</span>
+			</p:link></li>
+		<li><p:link href="#{request.contextPath}/packingList"
+				rendered="#{loginBean.menuDesconsolidado}">
+				<i class="fa fa-file-text-o"></i>
+				<span>Packing List</span>
+			</p:link></li>
+		<li><p:link href="#{request.contextPath}/contenedor"
+				rendered="#{loginBean.menuDespacho}">
+				<i class="fa fa-truck"></i>
+				<span>Despacho</span>
+			</p:link></li>
+		<li><p:link href="#{request.contextPath}/ptDisponibles"
+				rendered="#{loginBean.menuPtDisponible}">
+				<i class="fa fa-file-text-o"></i>
+				<span>Picking Ticket Disponibles</span>
+			</p:link></li>
+
+		<li><p:link href="#{request.contextPath}/resumenFacturacion"
+				rendered="#{loginBean.menuBuscaEtiqueta}">
+				<i class="fa fa-table"></i>
+				<span>Resumen Facturación</span>
+			</p:link></li>
+
+		<li><p:link href="#{request.contextPath}/buscarEtiqueta"
+				rendered="#{loginBean.menuBuscaEtiqueta}">
+				<i class="fa fa-search"></i>
+				<span>Buscar Etiqueta</span>
+			</p:link></li>
+
+		<li><p:link href="#{request.contextPath}/ajusteInventario"
+				rendered="#{loginBean.menuAjusteInventario}">
+				<i class="fa fa-file-excel-o"></i>
+				<span>Ajuste de Inventario</span>
+			</p:link></li>
+		<li><p:link href="#{request.contextPath}/existenciaCarga"
+				rendered="#{loginBean.menuExistencia}">
+				<i class="fa fa-cube"></i>
+				<span>Existencia de Carga</span>
+			</p:link></li>
+		<li><p:link href="#{request.contextPath}/repaletizado"
+				rendered="#{loginBean.menuRepaletizado}">
+				<i class="fa fa-cubes"></i>
+				<span>Repaletizado</span>
+			</p:link></li>
+
+
+		<li><p:link href="#{request.contextPath}/mensajesProcesados"
+				rendered="#{loginBean.menuMensajes}">
+				<i class="fa fa-file-text-o"></i>
+				<span>Mensajes Procesados</span>
+			</p:link></li>
+		<li><p:link href="#{request.contextPath}/mensajeBodega"
+				rendered="#{loginBean.menuMensajeBodega}">
+				<i class="fa fa-file-text-o"></i>
+				<span>Proceso Diario</span>
+			</p:link></li>
+	</ul>
+	<script type="text/javascript">
+        if (isMobile()) {
+            $('ul.sidebar-menu a.ui-link').click(function () {
+                $(this).prop('disabled', true);
+                showBar();
+            })
+        }
+    </script>
+
+</ui:composition>

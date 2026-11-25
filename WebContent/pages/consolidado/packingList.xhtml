@@ -1,0 +1,234 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:adm="http://github.com/adminfaces"
+	xmlns:of="http://omnifaces.org/functions"
+	xmlns:fn="http://java.sun.com/jsp/jstl/functions">
+
+<h:body>
+
+
+
+	<ui:composition template="/index.xhtml">
+		<ui:define name="content-begin">
+			<script>
+
+			function validacionDesp(){
+				$('validate')
+					.append('<div class="ui-messages-error ui-corner-all"><span class="ui-messages-error-icon"></span><ul></ul></div>')
+					.children('ul')
+						.append('<li><span class="ui-messages-error-summary">sumario</span><span class="ui-messages-error-detail">detalle</span></li>')
+				
+			}
+
+			</script>
+
+			<f:event type="preRenderView" listener="#{packingListBean.onLoad()}" />
+
+			<div class="ui-flat">
+				<p:panel header="Packing List" styleClass="card no-border">
+					<h:form id="formDespacho">
+						<p:messages id="mensajes" closable="true" showDetail="true" />
+						<p:panelGrid id="despachos" columns="4" layout="grid"
+							style="text-align: center;" styleClass="ui-flat"
+							columnClasses="ui-grid-col-3,ui-grid-col-3,ui-grid-col-3,ui-grid-col-3">
+
+							<p:autoComplete maxlength="12" style="width:100%!important"
+								inputStyle="width:100%!important" placeholder="CONTENEDOR"
+								value="#{packingListBean.nroCont}" minQueryLength="4"
+								onkeyup="value=value.toUpperCase()"
+								completeMethod="#{packingListBean.autoCompletarContenedor()}"
+								effect="fade">
+								<p:ajax event="keyup" global="false" />
+								<p:ajax event="query" global="false" />
+							</p:autoComplete>
+
+							<p:commandButton styleClass="btn btn-success btn-block"
+								style="width:100%!important" value="Buscar" icon="fa fa-search"
+								update="formTabla"
+								action="#{packingListBean.buscarContenedores()}">
+							</p:commandButton>
+						</p:panelGrid>
+					</h:form>
+				</p:panel>
+
+				<p:spacer height="9" />
+
+				<h:form id="formTabla">
+					<p:panel styleClass="card no-border" header="Resultados"
+						rendered="#{fn:length(packingListBean.listaContainer)!=0}">
+						<p:dataTable var="cont" value="#{packingListBean.listaContainer}"
+							rowIndexVar="rowIdx" style="text-align: center;">
+							<p:column width="10" headerText="#">
+								<p:outputLabel value="#{rowIdx + 1}" />
+							</p:column>
+							<p:column headerText="Contenedor" width="80">
+								<h:outputText value="#{cont.container}" />
+							</p:column>
+							<p:column headerText="Nave" width="80">
+								<h:outputText value="#{cont.ship}" />
+							</p:column>
+							<p:column headerText="Viaje" width="80">
+								<h:outputText value="#{cont.voyage}" />
+							</p:column>
+							<p:column headerText="Cliente" width="120">
+								<h:outputText value="#{cont.importador}" />
+							</p:column>
+							<p:column headerText="Estado" width="90">
+								<h:outputText value="#{cont.estado}" />
+							</p:column>
+							<p:column headerText="Fecha Consolidado" width="90">
+								<h:outputText
+									value="#{of:formatDate(cont.fechaConsolidado,  'dd-MM-yyyy')}" />
+							</p:column>
+							<p:column headerText="Generar Docto." width="80">
+								<p:commandLink id="imprimir" global="false" process="@this"
+									actionListener="#{packingListBean.cargarPackingList(cont)}"
+									oncomplete="PF('dlgPt').show();">
+									<h:graphicImage
+										value="data:image/jpg;base64,#{constantesBean.imprimir}"
+										width="25" height="25" />
+								</p:commandLink>
+								<p:tooltip for="imprimir" value="Generar Documentos"></p:tooltip>
+							</p:column>
+						</p:dataTable>
+					</p:panel>
+				</h:form>
+
+				<h:form id="formPt">
+
+					<p:dialog widgetVar="dlgPt" modal="true" draggable="false"
+						closeOnEscape="true" position="center center" showHeader="false"
+						hideEffect="fade" showEffect="fade" resizable="false"
+						height="600px" width="85%" closable="false"
+						onShow="PF('dlgPt').initPosition();"
+						style="background-color:#F0F0F0;" styleClass="box-success">
+
+						<div class="ui-flat">
+
+							<p:panel id="packingList" styleClass="card no-border"
+								style="width: 100%;">
+
+
+								<p:panel id="contenedor#{packingListBean.contenedor.container}"
+									styleClass="card no-border">
+
+
+
+									<p:outputPanel style="text-align: center;">
+										<p:outputLabel style="font-weight:bold; font-size: 20px; "
+											value="PACKING LIST" />
+									</p:outputPanel>
+
+									<p:spacer height="3"></p:spacer>
+
+									<table style="width: 100%; line-height: 15px;">
+										<tr>
+											<th style="width: 20%;"><p:outputLabel value="CLIENT:" /></th>
+											<th style="width: 20%;"><p:outputLabel value="VESSEL:" /></th>
+											<th style="width: 20%;"><p:outputLabel value="VOYAGE:" /></th>
+											<th style="width: 20%;"><p:outputLabel value="CONTAINER" /></th>
+											<th style="width: 20%;"><p:outputLabel value="SEAL:" /></th>
+										</tr>
+										<tr>
+											<td><p:outputLabel
+													style="font-weight:bold; font-size: 15px; "
+													value="#{packingListBean.contenedor.importador}" /></td>
+											<td><p:outputLabel
+													style="font-weight:bold; font-size: 15px; "
+													value="#{packingListBean.contenedor.ship}" /></td>
+											<td><p:outputLabel
+													style="font-weight:bold; font-size: 15px; "
+													value="#{packingListBean.contenedor.voyage}" /></td>
+											<td><p:outputLabel
+													style="font-weight:bold; font-size: 15px; "
+													value="#{packingListBean.contenedor.container}" /></td>
+											<td><p:outputLabel
+													style="font-weight:bold; font-size: 15px; "
+													value="#{packingListBean.contenedor.sello}" /></td>
+										</tr>
+									</table>
+
+									<hr />
+									<p:spacer height="3"></p:spacer>
+
+									<p:dataTable var="pt" value="#{packingListBean.listaPl}"
+										rowIndexVar="rowId" style="text-align: center;">
+										<p:column headerText="#" style="font-size: 10px; width: 5%; ">
+											<p:outputLabel value="#{rowId + 1}" style="font-size: 10px; text-align: center;"/>
+										</p:column>
+										<p:column headerText="POS"
+											style="font-size: 10px; width: 5%; ">
+											<p:outputLabel value="#{pt.pos}"
+												style="font-size: 10px; text-align: center;" />
+										</p:column>
+										<p:column headerText="LABEL"
+											style=" font-size: 10px;  width: 10%;">
+											<h:outputText value="#{pt.label}"
+												style="font-size: 10px; text-align: center;" />
+										</p:column>
+										<p:column headerText="OWNERID"
+											style="font-size: 10px;  width: 15%;">
+											<h:outputText value="#{pt.ownerId}"
+												style="font-size: 10px; text-align: center;" />
+										</p:column>
+										<p:column headerText="PRODUCT NUMBER"
+											style="font-size: 10px;  width: 20%; ">
+											<h:outputText value="#{pt.productNumber}"
+												style="font-size: 10px; text-align: center;" />
+										</p:column>
+										<p:column headerText="PRODUCT DESCRIP."
+											style="font-size: 10px;  width: 30%;">
+											<h:outputText value="#{pt.productDescription}"
+												style="font-size: 10px; text-align: center;" />
+										</p:column>
+										<p:column headerText="VINTAGE"
+											style=" font-size: 10px;  width: 10%;">
+											<h:outputText value="#{pt.vintage}"
+												style="font-size: 10px; text-align: center;" />
+										</p:column>
+										<p:column headerText="N° CASES"
+											style=" font-size: 10px;  width: 10%;">
+											<h:outputText value="#{pt.cantidad}"
+												style="font-size: 10px; text-align: center;" />
+										</p:column>
+
+									</p:dataTable>
+									<hr />
+									<p:outputLabel
+										value="Total Unit: #{packingListBean.totalCAntidad}"
+										style="font-size: 10px; text-align: center;" />
+								</p:panel>
+
+								<p:spacer height="40"></p:spacer>
+
+
+							</p:panel>
+
+							<p:spacer height="20"></p:spacer>
+
+							<p:outputPanel style="text-align: right;">
+								<p:commandButton styleClass="btn-flat btn-success"
+									value="Imprimir" icon="fa fa-print" style="width: 200px;">
+									<p:printer target="packingList" />
+								</p:commandButton>
+								<p:commandButton styleClass="btn-flat" update="@form"
+									onclick="PF('dlgpT').hide();" value="Cancelar"
+									icon="fa fa-close" style="width: 200px;">
+
+								</p:commandButton>
+							</p:outputPanel>
+
+						</div>
+
+					</p:dialog>
+
+				</h:form>
+			</div>
+		</ui:define>
+	</ui:composition>
+</h:body>
+</html>

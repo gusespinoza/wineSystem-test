@@ -1,0 +1,556 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+	xmlns:of="http://omnifaces.org/functions"
+	xmlns:adm="http://github.com/adminfaces">
+
+<h:head>
+	<script type="text/javascript">
+    PrimeFaces.locales['es'] = {
+        closeText: 'Cerrar',
+        prevText: 'Anterior',
+        nextText: 'Siguiente',
+        monthNames: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
+        monthNamesShort: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'],
+        dayNames: ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'],
+        dayNamesShort: ['Dom', 'Lun', 'Mar', 'Mie', 'Jue', 'Vie', 'Sab'],
+        dayNamesMin: ['D', 'L', 'M', 'X', 'J', 'V', 'S'],
+        weekHeader: 'Semana',
+        firstDay: 1,
+        isRTL: false,
+        showMonthAfterYear: false,
+        yearSuffix: '',
+        timeOnlyTitle: 'Sólo hora',
+        timeText: 'Tiempo',
+        hourText: 'Hora',
+        minuteText: 'Minuto',
+        secondText: 'Segundo',
+        millisecondText: 'Milisegundo',
+        currentText: 'Fecha actual',
+        ampm: false,
+        month: 'Mes',
+        week: 'Semana',
+        day: 'Día',
+        allDayText: 'Todo el día',
+        today: 'Hoy',
+        clear: 'Claro'
+    };
+</script>
+</h:head>
+<body>
+	<ui:composition template="/index.xhtml">
+		<ui:define name="content-begin">
+			<div>
+				<ui:insert name="content">
+					<h:form id="poForm">
+						<p:panel id="panelrecep" header="Recepción de carga Manual"
+							styleClass="ui-fluid card no-border ">
+							<f:event type="preRenderView"
+								listener="#{recepcionManualBean.onLoad}" />
+							<p:panelGrid columns="4" layout="grid" id="recepGrid"
+								contentStyleClass="p-align-baseline ui-fluid">
+
+								<p:inputText id="po" placeholder="P.O." title="P.O."
+									required="true" style="width: 100%"
+									value="#{recepcionManualBean.selectedPo.purchaseOrderId}"
+									onkeyup="value=value.toUpperCase()" />
+
+								<p:autoComplete id="codPro" placeholder="CODIGO PRODUCTO"
+									minQueryLength="4" title="CODIGO PRODUCTO" required="true"
+									style="width: 100%"
+									value="#{recepcionManualBean.selectedPo.productNumber}"
+									completeMethod="#{recepcionManualBean.autoCompletarCodProd()}">
+									<p:ajax event="keyup" global="false" />
+									<p:ajax global="false" event="query" />
+									<p:ajax global="false" event="itemSelect"
+										listener="#{recepcionManualBean.completarCodigoDesc()}"
+										update="@this prod" />
+								</p:autoComplete>
+
+
+								<p:autoComplete id="prod" placeholder="PRODUCTO" required="true"
+									minQueryLength="4" title="PRODUCTO" style="width: 100%"
+									value="#{recepcionManualBean.selectedPo.productDescription}"
+									completeMethod="#{recepcionManualBean.autoCompletarProd()}">
+									<p:ajax event="keyup" global="false" />
+									<p:ajax global="false" event="query" />
+									<p:ajax global="false" event="itemSelect"
+										listener="#{recepcionManualBean.completarDescCodigo()}"
+										update="@this codPro" />
+								</p:autoComplete>
+
+								<p:inputNumber id="unInf" required="true" decimalPlaces="0"
+									style="width: 100%" inputStyle="width: 100%"
+									placeholder="UNIDADES RECEPCIONADAS"
+									title="UNIDADES RECEPCIONADAS"
+									value="#{recepcionManualBean.selectedPo.purchaseOrderQuantity}"></p:inputNumber>
+
+								<p:inputText id="cosecha" placeholder="COSECHA" title="COSECHA"
+									required="true" style="width: 100%"
+									onkeyup="value=value.toUpperCase()"
+									value="#{recepcionManualBean.selectedPo.vintage}" />
+
+								<p:autoComplete maxlength="30" placeholder="VIÑA"
+									scrollHeight="200" style="width:100%;" required="true"
+									inputStyle="width:100%!important" forceSelection="false"
+									value="#{recepcionManualBean.selectedPo.ownerId}"
+									minQueryLength="4"
+									completeMethod="#{buscarEtiquetaBean.autoCompletarVinas}"
+									effect="fade">
+									<p:ajax event="keyup" global="false" />
+									<p:ajax event="query" global="false" />
+									<p:ajax event="itemSelect" global="false" />
+
+								</p:autoComplete>
+
+								<p:inputNumber id="notCaj" required="true" decimalPlaces="0"
+									style="width: 100%" inputStyle="width: 100%"
+									placeholder="BOTELLAS POR CAJA" title="BOTELLAS POR CAJA"
+									value="#{recepcionManualBean.selectedPo.bottlesPerUnit}"></p:inputNumber>
+
+								<p:inputNumber id="botMl" decimalPlaces="0" style="width: 100%"
+									inputStyle="width: 100%" placeholder="ML POR BOTELLA"
+									title="ML POR BOTELLA"
+									value="#{recepcionManualBean.selectedPo.mlPerBottle}"></p:inputNumber>
+
+
+								<p:selectOneMenu id="ss"
+									value="#{recepcionManualBean.selectedSs}" rendered="true"
+									style="width: 100%">
+									<p:autoUpdate />
+									<f:selectItem itemLabel="SLIPSHEET" noSelectionOption="false" />
+									<f:selectItems value="#{recepcionManualBean.slipSheet}" />
+									<p:ajax event="change" global="false" />
+								</p:selectOneMenu>
+
+								<p:inputText id="codF" style="width: 100%"
+									placeholder="CODIGO FERT" title="CODIGO FERT"
+									onkeyup="value=value.toUpperCase()"
+									value="#{recepcionManualBean.selectedPo.codFert}" />
+
+								<p:spacer height="8" />
+
+								<p:commandButton value="Agregar"
+									styleClass="btn btn-success btn-block" icon="fa fa-plus"
+									update="poForm:recepGrid"
+									oncomplete="if (args.validationFailed) validacion();"
+									action="#{recepcionManualBean.agregarPo()}"
+									style="width:100% !important" />
+							</p:panelGrid>
+						</p:panel>
+					</h:form>
+					<p:spacer />
+					<h:form id="poFormtbl">
+						<p:panel id="panelPo" header="Anuncio de carga"
+							styleClass="card no-border"
+							visible="#{fn:length(recepcionManualBean.listaPo) gt 0}">
+
+							<p:dataTable id="tblPo" var="po"
+								value="#{recepcionManualBean.listaPo}" rowIndexVar="rowId"
+								paginator="true"
+								emptyMessage="No se encontraron P.O disponibles para recepción"
+								style="text-align: center;" rows="60" rowKey="#{po.id}">
+
+								<p:column width="30" headerText="#">
+									<p:outputLabel value="#{rowId + 1}" />
+								</p:column>
+								<p:column headerText="PO" width="100">
+									<h:outputText value="#{po.purchaseOrderId}" />
+								</p:column>
+								<p:column headerText="Viña" width="150">
+									<h:outputText value="#{po.ownerId}" />
+								</p:column>
+								<p:column headerText="Cod. Producto" width="150">
+									<h:outputText value="#{po.productNumber}" />
+								</p:column>
+								<p:column headerText="Producto" width="220">
+									<h:outputText value="#{po.productDescription}" />
+								</p:column>
+								<p:column headerText="Unidades Recep." width="150">
+									<h:outputText value="#{po.recivedQuantity}" />
+								</p:column>
+								<p:column headerText="Bot x Caja" width="100">
+									<h:outputText value="#{po.bottlesPerUnit}" />
+								</p:column>
+								<p:column headerText="Ml x Bot" width="100">
+									<h:outputText value="#{po.mlPerBottle} ml." />
+								</p:column>
+								<p:column headerText="Cod. Fert" width="100">
+									<h:outputText value="#{po.codFert} " />
+								</p:column>
+								<p:column headerText="Acción" width="80">
+									<p:commandLink id="agregar"
+										actionListener="#{recepcionManualBean.cargaRecepcion(po)}">
+										<h:graphicImage
+											value="data:image/jpg;base64,#{constantesBean.agregar}"
+											width="25" height="25" />
+									</p:commandLink>
+									<p:tooltip for="agregar" value="Agregar Recepción"></p:tooltip>
+								</p:column>
+							</p:dataTable>
+						</p:panel>
+					</h:form>
+
+
+					<h:form id="recepcionForm">
+						<p:dialog widgetVar="rf" modal="true" draggable="false"
+							closeOnEscape="true" position="center center" showHeader="false"
+							hideEffect="fade" showEffect="fade" resizable="false"
+							height="auto" width="80%" closable="false"
+							onShow="PF('rf').initPosition();"
+							style="background-color:#F0F0F0;" styleClass="box-success">
+							<div class="ui-flat">
+								<p:panel header="Recepción" styleClass="card no-border"
+									id="rfPanel">
+
+									<p:panelGrid columns="6" layout="grid" id="panelManif"
+										columnClasses="ui-grid-col-2, ui-grid-col-2, ui-grid-col-2, ui-grid-col-2, ui-grid-col-2, ui-grid-col-2">
+
+										<p:outputLabel style="font-weight:bold; font-size: 15px;"
+											value="Purchase Order: #{recepcionManualBean.selectedPo.purchaseOrderId}" />
+
+										<p:outputLabel style="font-weight:bold; font-size: 15px; "
+											value="Producto: #{recepcionManualBean.selectedPo.productDescription}" />
+
+										<p:outputLabel style="font-weight:bold; font-size: 15px; "
+											value="Cosecha: #{recepcionManualBean.selectedPo.vintage}" />
+										<p:outputLabel style="font-weight:bold; font-size: 15px; "
+											value="Unidades Informadas: #{recepcionManualBean.selectedPo.purchaseOrderQuantity}" />
+
+										<p:outputLabel style="font-weight:bold; font-size: 15px; "
+											value="Unidades Recepcionadas: #{recepcionManualBean.totalDetalles}" />
+
+									</p:panelGrid>
+
+									<p:panelGrid id="rfGrid" columns="4"
+										columnClasses="ui-grid-col-3,ui-grid-col-3,ui-grid-col-3,ui-grid-col-3"
+										layout="grid">
+
+										<p:selectOneMenu id="menuDocs" required="true"
+											style="width: 100%" title="Tipo Doc"
+											value="#{recepcionManualBean.selectedDetalle.tipoDoc}"
+											rendered="true">
+											<p:autoUpdate />
+
+
+											<f:selectItem itemLabel="TIPO DOC" noSelectionOption="false" />
+											<f:selectItems value="#{recepcionManualBean.documentos}" />
+											<p:ajax event="change" global="false" />
+										</p:selectOneMenu>
+
+										<p:inputNumber id="numDoc" required="true" decimalPlaces="0"
+											style="width: 100%" inputStyle="width: 100%"
+											placeholder="NUMERO DOC" title="Numero Doc"
+											value="#{recepcionManualBean.selectedDetalle.numeroDoc}"></p:inputNumber>
+
+										<p:datePicker id="fechaDoc" locale="es" required="true"
+											inputStyle="width: 100%"
+											value="#{recepcionManualBean.selectedDetalle.fechaDoc}"
+											placeholder="FECHA DOC" title="Fecha Documento"
+											showIcon="true" pattern="dd-MMM-yyyy" />
+
+										<p:datePicker id="fechaRec" locale="es" required="true"
+											inputStyle="width: 100%"
+											value="#{recepcionManualBean.selectedDetalle.fechaRecepcion}"
+											placeholder="FECHA RECEPCIÓN" title="Fecha Recepción"
+											showIcon="true" pattern="dd-MMM-yyyy" />
+
+
+										<p:inputNumber id="cant" required="true" decimalPlaces="0"
+											placeholder="CANTIDAD" title="Cantidad"
+											inputStyle="width: 100%"
+											value="#{recepcionManualBean.selectedDetalle.cantidad}"></p:inputNumber>
+
+
+										<p:inputText id="lote" required="true" style="width: 100%"
+											onkeyup="value=value.toUpperCase()" placeholder="LOTE"
+											title="Lote"
+											value="#{recepcionManualBean.selectedDetalle.lote}" />
+
+										<p:selectOneMenu id="estado" style="width: 100%"
+											value="#{recepcionManualBean.selectedDetalle.estadoCarga}"
+											rendered="true">
+											<f:selectItem itemLabel="ESTADO" noSelectionOption="false" />
+											<f:selectItems value="#{recepcionManualBean.estados}" />
+											<p:ajax event="change" global="false" />
+										</p:selectOneMenu>
+
+
+
+										<p:selectOneMenu id="total" style="width: 100%"
+											value="#{recepcionManualBean.totalParcial}" rendered="true">
+											<f:selectItem itemLabel="TOTAL" noSelectionOption="false" />
+											<f:selectItems value="#{recepcionManualBean.slipSheet}" />
+											<p:ajax event="change" global="false" />
+										</p:selectOneMenu>
+
+
+										<p:inputNumber id="pallet" required="true" decimalPlaces="0"
+											placeholder="PALLET" title="PALLET" inputStyle="width: 100%"
+											value="#{recepcionManualBean.selectedDetalle.pallet}"></p:inputNumber>
+
+										<p:inputNumber id="cajaPallet" required="true"
+											placeholder="CAJAS POR PALLET" title="CAJAS POR PALLET"
+											decimalPlaces="0" inputStyle="width: 100%"
+											value="#{recepcionManualBean.selectedDetalle.cajasPorPallet}"></p:inputNumber>
+
+									</p:panelGrid>
+									<p:spacer height="8" />
+
+									<p:dataTable id="listDetalle"
+										value="#{recepcionManualBean.selectedPo.detalle}"
+										var="detalle" type="ordered"
+										emptyMessage="No se han encontrado recepciones"
+										style="display: inline-block;width:100%;text-align: center;">
+
+										<f:facet name="header">
+										</f:facet>
+
+										<p:autoUpdate />
+										<p:column headerText="Producto" width="100">
+											<h:outputText value="#{detalle.descripcionProducto}" />
+										</p:column>
+										<p:column headerText="Cosecha" width="90">
+											<h:outputText value="#{detalle.cosecha}" />
+										</p:column>
+										<p:column headerText="lote" width="100">
+											<h:outputText value="#{detalle.lote}" />
+										</p:column>
+										<p:column headerText="Cantidad" width="90">
+											<h:outputText value="#{detalle.cantidad}" />
+										</p:column>
+										<p:column headerText="Pallet" width="90">
+											<h:outputText value="#{detalle.pallet}" />
+										</p:column>
+										<p:column headerText="Cajas x Pallet" width="90">
+											<h:outputText value="#{detalle.cajasPorPallet} " />
+										</p:column>
+
+										<p:column headerText="Acción" width="60">
+											<p:commandButton icon="fa fa-minus-square" id="borrar"
+												styleClass="btn-danger btn-block btn-xs"
+												process="listDetalle"
+												actionListener="#{recepcionManualBean.quitarRecepcion(detalle)}">
+											</p:commandButton>
+											<p:tooltip for="borrar" value="Quitar"></p:tooltip>
+
+											<p:commandLink id="imp" global="false" process="@this"
+												actionListener="#{recepcionManualBean.impEtiquetas(detalle.etiquetas)}"
+												oncomplete="PF('dlgEtiquetas').show();">
+												<h:graphicImage
+													value="data:image/jpg;base64,#{constantesBean.imprimir}"
+													width="25" height="25" />
+											</p:commandLink>
+											<p:tooltip for="imp" value="Imprimir Etiquetas"></p:tooltip>
+										</p:column>
+
+									</p:dataTable>
+
+									<div style="text-align: right;">
+										<p:commandButton styleClass="btn btn-success btn-block"
+											id="btnAddDetalle" value="Agregar" icon="fa fa-plus"
+											update="listDetalle :recepcionForm:rfGrid"
+											oncomplete="if (args.validationFailed) validacion();"
+											style="width: 150px;height: 35px;"
+											disabled="#{recepcionManualBean.botonAgregar}"
+											action="#{recepcionManualBean.agregarRecepcion()}">
+										</p:commandButton>
+										<p:spacer width="2" />
+										<p:commandButton value="Guardar" icon="fa fa-save"
+											id="btnGuardar" styleClass="btn-flat" immediate="true"
+											action="#{recepcionManualBean.guardarRecepcion()}"
+											style="width: 150px;height: 35px;">
+										</p:commandButton>
+										<p:spacer width="2" />
+										<p:commandButton value="Cancelar" process="@this"
+											global="false" onclick="PF('rf').hide();habilitarScroll();"
+											icon="fa fa-close" styleClass="btn btn-flat"
+											style="width: 150px;height: 35px;">
+											<p:ajax update="poFormtbl" />
+										</p:commandButton>
+									</div>
+								</p:panel>
+							</div>
+						</p:dialog>
+
+					</h:form>
+
+
+					<h:form id="formEtiquetas">
+
+						<p:dialog widgetVar="dlgEtiquetas" modal="true" draggable="false"
+							closeOnEscape="true" position="center center" showHeader="false"
+							hideEffect="fade" showEffect="fade" resizable="false"
+							height="600px" width="85%" closable="false"
+							onShow="PF('dlgEtiquetas').initPosition();"
+							style="background-color:#F0F0F0;" styleClass="box-success">
+
+							<div class="ui-flat">
+
+								<p:panel id="etiquetas" styleClass="card no-border">
+
+									<p:repeat var="eti"
+										value="#{recepcionManualBean.listEtiquetasSel}">
+
+										<p:panel id="etiqueta#{eti.id}" styleClass="card no-border">
+
+											<p:outputPanel style="text-align: center;">
+												<p:barcode value="#{eti.qr}" type="qr" width="180"
+													height="180" />
+											</p:outputPanel>
+
+											<p:spacer height="3"></p:spacer>
+
+											<table style="width: 100%; line-height: 25px;">
+												<tr>
+													<th style="width: 18%;"><p:outputLabel
+															value="Etiqueta:" /></th>
+													<th style="width: 25%;"><p:outputLabel
+															value="Posición actual:" /></th>
+													<th style="width: 18%;"><p:outputLabel
+															value="Estado del bulto:" /></th>
+													<th style="width: 15%;"><p:outputLabel
+															value="Repaletizado:" /></th>
+													<th style="width: 13%;"><p:outputLabel value="FERT:" /></th>
+													<th style="width: 13%;"><p:outputLabel
+															value="Cajas/Pallet:" /></th>
+												</tr>
+												<tr>
+													<td><p:outputLabel
+															style="font-weight:bold; font-size: 22px; "
+															value="#{eti.nroEtiqueta}" /></td>
+													<td><p:outputLabel
+															rendered="#{eti.estado eq 'ALMACENADA'}"
+															style="font-weight:bold; font-size: 22px; "
+															value="Pas #{eti.pasillo} - Pos #{eti.posicion} - Alt #{eti.altura} " /></td>
+													<td><p:outputLabel
+															style="font-weight:bold; font-size: 22px; margin-right: 10px;"
+															value="#{eti.estado}" /></td>
+													<td><p:outputLabel
+															style="font-weight:bold; font-size: 22px; margin-right: 10px; "
+															value="#{(eti.historialRepaletizado.contains('/')) ? 'Si' : 'No'}" /></td>
+													<td><p:outputLabel
+															style="font-weight:bold; font-size: 22px;"
+															value="#{eti.detallePo.po.codFert}" /></td>
+													<td><p:outputLabel
+															style="font-weight:bold; font-size: 22px; argin-right: 10px; "
+															value="#{eti.cajasPallet}" /></td>
+												</tr>
+											</table>
+
+											<hr />
+											<p:spacer height="5"></p:spacer>
+
+											<table style="width: 100%; line-height: 30px;">
+												<tr>
+													<th style="width: 25%;"><p:outputLabel value="P.O.:" /></th>
+													<th style="width: 25%;"><p:outputLabel
+															style="font-size: 15px; line-height: 1;width: 100%;"
+															value="#{eti.detallePo.po.purchaseOrder}" /></th>
+
+													<th style="width: 25%;"><p:outputLabel
+															value="Owner Id:" /></th>
+													<th style="width: 25%;"><p:outputLabel
+															style=" font-size: 15px; line-height: 1;width: 100%;"
+															value="#{eti.detallePo.po.ownerId}" /></th>
+												</tr>
+
+												<tr>
+
+
+													<th style="width: 25%;"><p:outputLabel
+															value="Producto:" /></th>
+													<th style="width: 25%;"><p:outputLabel
+															style="font-weight:bold; font-size: 18px; line-height: 1;width: 100%;"
+															value="#{eti.detallePo.descripcionProducto}" /></th>
+
+													<th style="width: 25%;"><p:outputLabel value="Código:" /></th>
+													<th style="width: 25%;"><p:outputLabel
+															style=" font-size: 15px; line-height: 1;width: 100%;"
+															value="#{eti.detallePo.codProducto}" /></th>
+												</tr>
+
+												<tr>
+
+													<th style="width: 25%;"><p:outputLabel
+															value="Botellas / Caja:" /></th>
+													<th style="width: 25%;"><p:outputLabel
+															style=" font-size: 15px; line-height: 1;width: 100%;"
+															value="#{eti.detallePo.po.bottlesPerUnit}" /></th>
+
+													<th style="width: 25%;"><p:outputLabel
+															value="Recepción:" /></th>
+													<th style="width: 25%;"><p:outputLabel
+															style=" font-size: 15px; line-height: 1;width: 100%;"
+															value="#{of:formatDate(eti.detallePo.fechaRecepcion, 'dd-MM-yyyy')}" />
+													</th>
+												</tr>
+
+												<tr>
+
+
+													<th style="width: 25%;"><p:outputLabel
+															value="Cajas por Pallet:" /></th>
+													<th style="width: 25%;"><p:outputLabel
+															style=" font-weight:bold; font-size: 18px; line-height: 1;width: 100%"
+															value="#{eti.detallePo.cajasPorPallet}" /></th>
+
+													<th style="width: 25%;"><p:outputLabel
+															value="Cosecha:" /></th>
+													<th style="width: 25%;"><p:outputLabel
+															style=" font-size: 15px; line-height: 1;width: 100%;"
+															value="#{eti.detallePo.cosecha}" /></th>
+												</tr>
+
+												<tr>
+													<th style="width: 25%;"><p:outputLabel value="Cc:" /></th>
+													<th style="width: 25%;"><p:outputLabel
+															style=" font-size: 15px; line-height: 1;width: 100%;"
+															value="#{eti.detallePo.po.mlPerBottle}" /></th>
+
+													<th style="width: 25%;"><p:outputLabel value="Lote:" /></th>
+													<th style="width: 25%;"><p:outputLabel
+															style="font-weight:bold; font-size: 18px; line-height: 1;width: 100%"
+															value="#{eti.detallePo.lote}" /></th>
+												</tr>
+											</table>
+
+										</p:panel>
+
+										<p:spacer height="40"></p:spacer>
+
+									</p:repeat>
+
+
+								</p:panel>
+
+								<p:spacer height="20"></p:spacer>
+
+								<p:outputPanel style="text-align: right;">
+									<p:commandButton styleClass="btn-flat btn-success"
+										value="Imprimir" icon="fa fa-print" style="width: 200px;">
+										<p:printer target="etiquetas" />
+									</p:commandButton>
+									<p:commandButton styleClass="btn-flat" update="@form"
+										onclick="PF('dlgEtiquetas').hide();" value="Cancelar"
+										icon="fa fa-close" style="width: 200px;">
+
+									</p:commandButton>
+								</p:outputPanel>
+
+							</div>
+
+						</p:dialog>
+
+					</h:form>
+
+				</ui:insert>
+			</div>
+		</ui:define>
+	</ui:composition>
+</body>
+</html>

@@ -1,0 +1,73 @@
+# ============================================================
+# 1. Build output (Maven)
+# ============================================================
+target/
+build/
+out/
+*.class
+*.war
+*.ear
+
+# ============================================================
+# 2. Eclipse / STS (tu IDE actual)
+# ============================================================
+.settings/
+.classpath
+.project
+.factorypath
+.tern-project
+.apt_generated/
+.springBeans
+.sts4-cache/
+
+# ============================================================
+# 3. IntelliJ IDEA (por si alguien migra)
+# ============================================================
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# ============================================================
+# 4. Metadatos SVN (estás migrando desde SVN)
+# ============================================================
+.svn/
+
+# ============================================================
+# 5. Logs y temporales
+# ============================================================
+*.log
+logs/
+*.tmp
+*.bak
+*.swp
+*~
+
+# ============================================================
+# 6. Sistema operativo
+# ============================================================
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ============================================================
+# 7. CREDENCIALES Y CONFIGURACIÓN LOCAL ⚠️ CRÍTICO
+# ============================================================
+# Archivos con credenciales reales de BD / SMTP / FTP
+hibernate.properties
+*-local.properties
+*.env
+.env
+
+# ============================================================
+# 8. JARs: excluir todos, EXCEPTO los propietarios que sí versionamos
+# ============================================================
+*.jar
+!WebContent/WEB-INF/lib/SEG_USUMARVAL-*.jar
+!src/main/resources/SEG_USUMARVAL-*.jar
+
+# ============================================================
+# 9. Configuración del entorno de despliegue
+# ============================================================
+*.log4j
+jboss-web.xml.local

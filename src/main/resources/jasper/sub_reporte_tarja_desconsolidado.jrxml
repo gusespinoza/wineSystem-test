@@ -1,0 +1,219 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.14.0.final using JasperReports Library version 6.14.0-2ab0d8625be255bf609c78e1181801213e51db8f  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="sub_reporte_tarja_desconsolidado" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="b01d0043-6448-421d-b6e1-ec51da86060a">
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="One Empty Record"/>
+	<subDataset name="tarjaBultos" uuid="0d90997a-5d86-4afd-af3e-a9f3ad94a7e8">
+		<property name="com.jaspersoft.studio.data.defaultdataadapter" value="One Empty Record"/>
+		<queryString>
+			<![CDATA[]]>
+		</queryString>
+		<field name="detalleBultos" class="java.lang.String"/>
+	</subDataset>
+	<queryString>
+		<![CDATA[]]>
+	</queryString>
+	<field name="nroBl" class="java.lang.String"/>
+	<field name="etiqueta" class="java.lang.String"/>
+	<field name="marcas" class="java.lang.String"/>
+	<field name="peso" class="java.lang.Double"/>
+	<field name="volumen" class="java.lang.String"/>
+	<field name="totalBultos" class="java.lang.Integer"/>
+	<field name="condicion" class="java.lang.String"/>
+	<field name="hora" class="java.lang.String"/>
+	<field name="observaciones" class="java.lang.String"/>
+	<field name="detalleBultos" class="java.util.Collection"/>
+	<background>
+		<band height="9" splitType="Stretch">
+			<line>
+				<reportElement x="0" y="8" width="555" height="1" uuid="bc70656f-1cf5-4a5a-b102-53f7eee4681b"/>
+				<graphicElement>
+					<pen lineStyle="Dashed"/>
+				</graphicElement>
+			</line>
+		</band>
+	</background>
+	<columnHeader>
+		<band height="7" splitType="Stretch">
+			<line>
+				<reportElement x="0" y="0" width="555" height="1" uuid="bc70656f-1cf5-4a5a-b102-53f7eee4681b"/>
+			</line>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="63" splitType="Stretch">
+			<staticText>
+				<reportElement x="10" y="7" width="50" height="13" uuid="93f42652-b944-4261-878a-2d38f6a9cf4e"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[BL - Nro:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="445" y="7" width="55" height="13" uuid="6df7e859-fca3-472e-9bee-d752f697aaa3"/>
+				<text><![CDATA[ETIQUETA:]]></text>
+			</staticText>
+			<line>
+				<reportElement x="0" y="20" width="555" height="1" uuid="497f8c12-85c4-4253-989e-4d93cdd3a1ee"/>
+			</line>
+			<staticText>
+				<reportElement x="52" y="26" width="34" height="12" uuid="dabce1f4-9160-4463-afae-2518cb1b62f2"/>
+				<textElement textAlignment="Center">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Marcas]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="240" y="26" width="60" height="12" uuid="acf939cf-6359-4bae-b454-f3f8c24f6961"/>
+				<textElement textAlignment="Center">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Detalle de bultos]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="405" y="26" width="39" height="12" uuid="f254cc1d-49d9-4992-9043-3751e67ec845"/>
+				<textElement textAlignment="Center">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Peso (kg)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="512" y="26" width="20" height="12" uuid="8fda5abf-f1aa-4a5f-8d24-a2941ff025c2"/>
+				<textElement textAlignment="Center">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[m3]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="60" y="7" width="380" height="13" uuid="e4af5f8f-1663-4c78-8e80-675fc94ee415">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="055c025c-4a9f-4535-bccd-236db321d49f"/>
+				</reportElement>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{nroBl}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="500" y="7" width="55" height="13" uuid="3b55b527-81ad-42e2-a320-70adb7d60ffa">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="51397922-32c0-4dfb-90c9-66c593bc61f2"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{etiqueta}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+				<reportElement positionType="Float" stretchType="RelativeToTallestObject" x="0" y="38" width="160" height="22" uuid="8eeeb5b5-ed73-4f58-a453-2882a67d20e4">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="9dff1c40-4176-45a9-9f54-8b25b92f34ff"/>
+				</reportElement>
+				<textElement textAlignment="Left" verticalAlignment="Top">
+					<font size="8"/>
+					<paragraph lineSpacing="Proportional"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{marcas}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00#;#,##0.00#-">
+				<reportElement x="394" y="38" width="60" height="22" uuid="6745a88a-6417-4d0a-919a-1a7557b44b09">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="5fbaa4be-dd9b-454c-b707-22ec618d91dc"/>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{peso}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="480" y="38" width="75" height="22" uuid="ab2b95e7-95c8-449a-9195-112e11feebac">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="21e5cdaa-3ddb-4a98-9fa2-720f843a4cb9"/>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{volumen}]]></textFieldExpression>
+			</textField>
+			<componentElement>
+				<reportElement x="169" y="38" width="220" height="11" uuid="e2f24c6a-a363-4fd8-b42a-40e3df9cdece">
+					<property name="net.sf.jasperreports.export.headertoolbar.table.name" value=""/>
+				</reportElement>
+				<jr:list xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd" printOrder="Vertical">
+					<datasetRun subDataset="tarjaBultos" uuid="fdb352f6-a0d8-421c-a614-dd852072b4e6">
+						<dataSourceExpression><![CDATA[new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource($F{detalleBultos})]]></dataSourceExpression>
+					</datasetRun>
+					<jr:listContents height="11" width="220">
+						<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+							<reportElement x="0" y="0" width="220" height="11" uuid="84e585cc-0450-4542-b0f4-cefb1b01cf51"/>
+							<textElement>
+								<font size="8"/>
+							</textElement>
+							<textFieldExpression><![CDATA[$F{detalleBultos}]]></textFieldExpression>
+						</textField>
+					</jr:listContents>
+				</jr:list>
+			</componentElement>
+		</band>
+		<band height="71" splitType="Stretch">
+			<line>
+				<reportElement x="0" y="3" width="555" height="1" uuid="5e67cd24-b185-4b7f-99cd-855506a14b8c"/>
+			</line>
+			<staticText>
+				<reportElement x="10" y="5" width="76" height="13" uuid="5bd17abd-04cc-41c7-8e83-157659846538"/>
+				<textElement>
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[TOTAL BULTOS:]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="86" y="5" width="34" height="13" uuid="dbc79e0a-90ac-4bec-976b-4a206634b297">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="0c9ed862-49b6-4d39-9e55-bc1b872b5247"/>
+				</reportElement>
+				<textElement>
+					<font size="9" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{totalBultos}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="147" y="5" width="59" height="13" uuid="bc1ee05c-e36b-4d44-9e81-246ae783a42a"/>
+				<textElement>
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[CONDICIÓN:]]></text>
+			</staticText>
+			<textField>
+				<reportElement positionType="Float" stretchType="RelativeToTallestObject" x="206" y="5" width="263" height="20" uuid="1b429858-e64d-4f08-b885-d2c24c476d2c">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="4a7920d0-7b37-41b8-a5c6-f32b836fd927"/>
+				</reportElement>
+				<textElement>
+					<font size="9" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{condicion}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="469" y="5" width="31" height="13" uuid="e54c58e9-becf-45a8-8b7c-13f835653192"/>
+				<textElement>
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[HORA:]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="500" y="5" width="55" height="13" uuid="56bf78ab-8460-4b51-9ef1-69f7b290c763">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="16661bfa-cb01-466d-8580-4d8e6109be09"/>
+				</reportElement>
+				<textElement textAlignment="Center">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{hora}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="10" y="25" width="76" height="12" uuid="a14a056d-ad46-4609-b2d3-eb3de959ae58"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[OBSERVACIONES:]]></text>
+			</staticText>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+				<reportElement positionType="Float" stretchType="RelativeToTallestObject" isPrintRepeatedValues="false" x="86" y="25" width="469" height="42" uuid="a06da044-9d81-441b-8039-8498133ab67e">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="5083fc69-fa1a-4e56-8f69-580dc14b5189"/>
+				</reportElement>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{observaciones}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

@@ -1,0 +1,223 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+	xmlns:of="http://omnifaces.org/functions"
+	xmlns:adm="http://github.com/adminfaces">
+<h:outputStylesheet library="css" name="styles.css" />
+<h:head>
+
+	<script type="text/javascript">
+    PrimeFaces.locales['es'] = {
+        closeText: 'Cerrar',
+        prevText: 'Anterior',
+        nextText: 'Siguiente',
+        monthNames: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
+        monthNamesShort: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'],
+        dayNames: ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'],
+        dayNamesShort: ['Dom', 'Lun', 'Mar', 'Mie', 'Jue', 'Vie', 'Sab'],
+        dayNamesMin: ['D', 'L', 'M', 'X', 'J', 'V', 'S'],
+        weekHeader: 'Semana',
+        firstDay: 1,
+        isRTL: false,
+        showMonthAfterYear: false,
+        yearSuffix: '',
+        timeOnlyTitle: 'Sólo hora',
+        timeText: 'Tiempo',
+        hourText: 'Hora',
+        minuteText: 'Minuto',
+        secondText: 'Segundo',
+        millisecondText: 'Milisegundo',
+        currentText: 'Fecha actual',
+        ampm: false,
+        month: 'Mes',
+        week: 'Semana',
+        day: 'Día',
+        allDayText: 'Todo el día',
+        today: 'Hoy',
+        clear: 'Claro'
+    };
+</script>
+	<title>Marval WineSystem</title>
+
+</h:head>
+
+<h:body id="body">
+
+	<ui:composition template="/index.xhtml">
+
+		<ui:define name="content-begin">
+			<style type="text/css">
+</style>
+			<p:ajaxStatus onstart="PF('statusDialog').show();"
+				onsuccess="PF('statusDialog').hide();" />
+
+			<div class="ui-flat">
+
+				<h:form onkeyup="if(event.keyCode == 13) return false;"
+					style="width:100%!important" id="formCargaPallet">
+
+					<f:event type="preRenderView" listener="#{despachoBean.onLoad()}" />
+
+					<p:panel id="panelTraspasoPallet" header="Despacho"
+						style="width:100%!important" styleClass="card no-border">
+						<p:panelGrid columns="4" layout="grid"
+							columnClasses="ui-grid-col-3,ui-grid-col-3,ui-grid-col-3,ui-grid-col-3">
+
+							<p:selectOneMenu id="contenedores" style="width:100%!important"
+								converter="omnifaces.SelectItemsConverter"
+								value="#{despachoBean.selectedCont}">
+								<f:selectItem itemLabel="CONTENEDOR" itemValue="" />
+								<f:selectItems value="#{despachoBean.listaCont.entrySet()}"
+									var="cont" itemLabel="#{cont.value}" itemValue="#{cont.key}" />
+							</p:selectOneMenu>
+							<p:commandButton styleClass="btn btn-success btn-block"
+								value="Despachar" icon="fa fa-fw fa-search"
+								style="width:100% !important"
+								actionListener="#{despachoBean.validarContenedor()}">
+							</p:commandButton>
+						</p:panelGrid>
+						<p:outputPanel style="width:100%!important;text-align:right">
+
+						</p:outputPanel>
+					</p:panel>
+
+				</h:form>
+
+				<h:form id="contForm">
+					<p:dialog widgetVar="rf" modal="true" draggable="false"
+						closeOnEscape="true" position="center center" showHeader="false"
+						hideEffect="fade" showEffect="fade" resizable="true" height="100%"
+						width="80%" closable="false" onShow="PF('rf').initPosition();"
+						style="background-color:#F0F0F0;" styleClass="box-success">
+						<div class="ui-flat">
+							<p:panel
+								header="Contenedor: #{despachoBean.contenedor.container}"
+								styleClass="card no-border" id="rfPanel">
+
+								<p:panelGrid columns="4" layout="grid" id="panelManif"
+									columnClasses="ui-grid-col-3, ui-grid-col-3, ui-grid-col-3, ui-grid-col-3">
+
+									<p:outputLabel style="font-weight:bold; font-size: 15px;"
+										value="Nave: #{despachoBean.contenedor.ship}" />
+
+									<p:outputLabel style="font-weight:bold; font-size: 15px; "
+										value="Viaje: #{despachoBean.contenedor.voyage}" />
+
+									<p:outputLabel style="font-weight:bold; font-size: 15px; "
+										value="Sello: #{despachoBean.contenedor.sello}" />
+
+
+								</p:panelGrid>
+
+								<p:panelGrid id="rfGrid" columns="4"
+									columnClasses="ui-grid-col-3,ui-grid-col-3,ui-grid-col-3,ui-grid-col-3"
+									layout="grid">
+
+									<p:selectOneMenu id="menuDocs" required="true"
+										style="width: 100%"
+										value="#{despachoBean.contenedor.tipoDocu}" rendered="true">
+										<p:autoUpdate />
+
+
+										<f:selectItem itemLabel="TIPO DOCUMENTO"
+											noSelectionOption="true" />
+										<f:selectItems value="#{despachoBean.documentos}" />
+										<p:ajax event="change" global="false" />
+									</p:selectOneMenu>
+
+
+
+								
+									<p:inputText value="#{despachoBean.contenedor.numeroDoc}"
+									placeholder="NUMERO DOCUMENTO" title="NUMERO DOCUMENTO"
+										id="numDoc" onkeyup="value=value.toUpperCase()"
+										style="width:100%!important">
+										<p:ajax event="keyup" global="false" />
+									</p:inputText>
+
+									
+									<p:calendar id="fechaDoc" style="width:100% !important"
+										widgetVar="fechaDocWV" showOn="button"
+										inputStyle="width:100% !important"
+										placeholder="FECHA DOCUMENTO" title="FECHA DOCUMENTO"
+										onclick="PF('fechaDocWV').jqEl.datetimepicker('show');return false;"
+										value="#{despachoBean.contenedor.fechaDoc}"
+										pattern="dd-MM-yyyy HH:mm" locale="es">
+										<p:ajax event="change" global="false"></p:ajax>
+									</p:calendar>
+
+									
+									<p:calendar id="fechaIni" style="width:100% !important"
+										widgetVar="fechaIniWV" showOn="button"
+										inputStyle="width:100% !important"
+										placeholder="INICIO COSOLIDADO" title="INICIO CONSOLIDADO"
+										onclick="PF('fechaIniWV').jqEl.datetimepicker('show');return false;"
+										value="#{despachoBean.contenedor.iniConsolidado}"
+										pattern="dd-MM-yyyy HH:mm" locale="es">
+										<p:ajax event="change" global="false"></p:ajax>
+									</p:calendar>
+
+
+									
+
+									<p:calendar id="fechaFin" style="width:100% !important"
+										widgetVar="fechaFinWV" showOn="button"
+										inputStyle="width:100% !important"
+										placeholder="FIN CONSOLIDADO" title="FIN CONSOLIDADO"
+										onclick="PF('fechaFinWV').jqEl.datetimepicker('show');return false;"
+										value="#{despachoBean.contenedor.finConsolidado}"
+										pattern="dd-MM-yyyy HH:mm" locale="es">
+										<p:ajax event="change" global="false"></p:ajax>
+									</p:calendar>
+
+									
+									<p:calendar id="fechaEmb" style="width:100% !important"
+										widgetVar="fechaEmbWV" showOn="button"
+										placeholder="FECHA DESPACHO" title="FECHA DESPACHO"
+										inputStyle="width:100% !important"
+										onclick="PF('fechaEmbWV').jqEl.datetimepicker('show');return false;"
+										value="#{despachoBean.contenedor.fechaEmbarque}"
+										pattern="dd-MM-yyyy HH:mm" locale="es">
+										<p:ajax event="change" global="false"></p:ajax>
+									</p:calendar>
+
+									
+									<p:inputNumber id="vgm" required="true" decimalPlaces="0" placeholder="VGM" title="VGM"
+										style="width: 100%" inputStyle="width: 100%"
+										value="#{despachoBean.contenedor.vgm}"></p:inputNumber>
+
+									<p:spacer></p:spacer>
+									<p:spacer></p:spacer>
+
+								</p:panelGrid>
+
+								<div style="text-align: right;">
+
+									<p:commandButton value="Guardar" icon="fa fa-save"
+										id="btnGuardar" styleClass="btn-flat" update="contForm:rfGrid"
+										oncomplete="if (args.validationFailed) validacion();"
+										action="#{despachoBean.cargarListas()}"
+										style="width: 150px;height: 35px;">
+									</p:commandButton>
+									<p:spacer width="2" />
+									<p:commandButton value="Cancelar" process="@this"
+										global="false" onclick="PF('rf').hide();habilitarScroll();"
+										icon="fa fa-close" styleClass="btn btn-flat"
+										style="width: 150px;height: 35px;">
+									</p:commandButton>
+								</div>
+							</p:panel>
+						</div>
+					</p:dialog>
+
+				</h:form>
+
+			</div>
+		</ui:define>
+	</ui:composition>
+</h:body>
+</html>

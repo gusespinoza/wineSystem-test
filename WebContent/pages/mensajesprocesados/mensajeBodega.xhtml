@@ -1,0 +1,117 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:adm="http://github.com/adminfaces"
+	xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+	xmlns:of="http://omnifaces.org/functions">
+
+<h:head>
+	<link rel="shortcut icon" type="image/x-icon" href="favicon.ico" />
+</h:head>
+<body>
+	<ui:composition template="/index.xhtml">
+		<ui:define name="content-begin">
+
+			<div class="ui-flat">
+				<h:form id="formBusqueda" enctype="multipart/form-data">
+
+					<f:event type="preRenderView"
+						listener="#{mensajeBodegaBean.onLoad()}" />
+
+					<p:panel styleClass="card no-border" id="panel-busqueda"
+						header="Generar archivo INVENTORYRECON">
+
+						<p:messages id="mensajes" for="mensajes" closable="true"
+							showDetail="true">
+
+						</p:messages>
+
+						<p:panelGrid columns="5" layout="grid"
+							columnClasses="ui-grid-col-3,ui-grid-col-3,ui-grid-col-3,ui-grid-col-3,ui-grid-col-3">
+
+							<p:commandButton value="Cargar Información" icon="fa fa-search"
+								style="width:100%;" update="panel2"
+								actionListener="#{mensajeBodegaBean.cargarInfo()}"
+								widgetVar="boton" styleClass="btn btn-success" />
+
+						</p:panelGrid>
+
+
+
+						<p:spacer />
+					</p:panel>
+					<br />
+					<p:panel id="panel2" header="Resultados"
+						widgetVar="panel-Resultado" styleClass="card no-border"
+						visible="#{fn:length(mensajeBodegaBean.listaMensaje) gt 0}">
+
+						<br />
+
+						<p:dataTable id="tablaResult" var="mensaje"
+							rowIndexVar="rowIdx" widgetVar="tblAsignacion" global="false"
+							value="#{mensajeBodegaBean.listaMensaje}" paginator="false"
+							rows="100" emptyMessage="No hay etiquetas asociadas"
+							style="text-align: center;">
+							<f:facet name="header">
+								<p:panelGrid columns="3" styleClass="ui-noborder"
+									id="panelTabla" columnClasses="ui-grid-col-12,ui-grid-col-4,ui-grid-col-4"
+									style="height:45px;">
+									<p:outputPanel style="text-align: left;">
+
+										<p:outputLabel
+											style="font-weight: 700;font-size: 15px;line-height: 1.0;"
+											value="Cantidad de cajas: #{mensajeBodegaBean.cantidadTotal} | Concha y Toro:  #{mensajeBodegaBean.cantidadConchaToro} | Emiliana:  #{mensajeBodegaBean.cantidadEmiliana} | Cono Sur:  #{mensajeBodegaBean.cantidadConoSur}" />
+									</p:outputPanel>
+									<p:outputPanel style="text-align: right;" >
+										<p:commandButton id="btnEnvioAjuste" resetValues="true"
+											disabled="#{mensajeBodegaBean.envioAjuste}"
+											actionListener="#{mensajeBodegaBean.crearAjuste()}"
+											global="false" value="Generar Ajustes" icon="fa fa-file-text-o"
+											styleClass="btn btn-info" process="@this"
+											style="width:200px;" />
+										
+
+									</p:outputPanel>
+									<p:outputPanel style="text-align: right;">
+										<p:commandButton id="btnEnvioBodega" resetValues="true"
+											disabled="#{!mensajeBodegaBean.envioMensaje}"
+											actionListener="#{mensajeBodegaBean.crearInventoryRecon()}"
+											global="false" value="Mensaje Diario"
+											icon="fa fa-file-text-o" styleClass="btn btn-success"
+											process="@this" style="width:200px;" />
+									</p:outputPanel>
+								</p:panelGrid>
+							</f:facet>
+
+							<p:column width="10" headerText="#">
+								<p:outputLabel value="#{rowIdx + 1}" />
+							</p:column>
+
+							<p:column headerText="Viña" width="20">
+								<h:outputText value="#{mensaje.vina}" />
+							</p:column>
+							<p:column headerText="Cod. Producto" width="20">
+								<h:outputText value="#{mensaje.codProducto}" />
+							</p:column>
+							<p:column headerText="Cosecha" width="20">
+								<h:outputText value="#{mensaje.cosecha}" />
+							</p:column>
+							<p:column headerText="Estado" width="30">
+								<h:outputText value="#{mensaje.estado}" />
+							</p:column>
+							<p:column headerText="Cantidad" width="50">
+								<h:outputText value="#{mensaje.cantidad}" />
+							</p:column>
+
+						</p:dataTable>
+					</p:panel>
+				</h:form>
+			</div>
+		</ui:define>
+
+	</ui:composition>
+</body>
+</html>

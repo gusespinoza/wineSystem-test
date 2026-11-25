@@ -1,0 +1,128 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:of="http://omnifaces.org/functions"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:adm="http://github.com/adminfaces"
+	xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+	xmlns:pe="http://primefaces.org/ui/extensions"
+	xmlns:o="http://omnifaces.org/ui">
+<h:head>
+	<title>Marval AEP</title>
+</h:head>
+
+<h:body>
+
+	<ui:composition template="/index.xhtml">
+
+		<ui:define name="content-begin">
+
+			<p:ajaxStatus onstart="PF('statusDialog').show();"
+				onsuccess="PF('statusDialog').hide();" />
+
+			<div class="ui-flat">
+
+				<h:form id="asignarUbicacionForm">
+
+					<f:event type="preRenderView"
+						listener="#{ubicacionBean.onLoadAsignar()}" />
+
+					<p:panel id="retiroDirectoPanel" header="Asignar Ubicación"
+						styleClass="card no-border">
+
+
+						<p:panelGrid columns="4" id="panelData" class="ui-flat"
+							layout="grid"
+							columnClasses="ui-grid-col-3,ui-grid-col-5, ui-grid-col-3, ui-grid-col-5"
+							style="width:100% !important;">
+
+
+							<p:outputLabel for="etiqueta" value="Etiqueta" />
+
+							<p:autoComplete maxlength="10" id="etiqueta" scrollHeight="200"
+								style="width:100%;" inputStyle="width:100%!important"
+								forceSelection="true" value="#{ubicacionBean.etiqueta}"
+								minQueryLength="4"
+								completeMethod="#{ubicacionBean.autoCompletaEtiquetaRecep}"
+								effect="fade"
+								onkeypress="if(event.which &lt; 48 || event.which &gt; 57 ) if(event.which != 8) return false;"
+								onkeyup="if(event.keyCode != 8 &amp;&amp; value.length == 4) value = value + '-'">
+								<p:ajax event="keyup" global="false" />
+								<p:ajax event="query" global="false" />
+								<p:ajax event="itemSelect" global="false" />
+							</p:autoComplete>
+
+
+							<p:outputLabel for="pasill" value="Pasillo"></p:outputLabel>
+							<p:selectOneMenu id="pasill" value="#{ubicacionBean.pasillo}"
+								filter="true" effect="fade" style="width:100%!important"
+								onkeyup="value=value.toUpperCase()">
+								<f:selectItem itemLabel="12" itemValue="12" />
+								<f:selectItem itemLabel="13" itemValue="13" />
+								<f:selectItem itemLabel="14" itemValue="14" />
+								<f:selectItem itemLabel="15" itemValue="15" />
+								<f:selectItem itemLabel="16" itemValue="16" />
+								<f:selectItem itemLabel="17" itemValue="17" />
+								<f:selectItem itemLabel="18" itemValue="18" />
+								<f:selectItem itemLabel="19" itemValue="19" />
+								<f:selectItem itemLabel="20" itemValue="20" />
+								<f:selectItem itemLabel="21" itemValue="21" />
+								<f:selectItem itemLabel="22" itemValue="22" />
+								<f:selectItem itemLabel="23" itemValue="23" />
+								<f:selectItem itemLabel="24" itemValue="24" />
+								<f:selectItem itemLabel="25" itemValue="25" />
+								<f:selectItem itemLabel="26" itemValue="26" />
+								<f:selectItem itemLabel="27" itemValue="27" />
+								<f:selectItem itemLabel="28" itemValue="28" />
+								<f:selectItem itemLabel="29" itemValue="29" />
+								<f:selectItem itemLabel="30" itemValue="30" />
+								<f:selectItem itemLabel="31" itemValue="31" />
+								<f:selectItem itemLabel="32" itemValue="32" />
+								<f:selectItem itemLabel="33" itemValue="33" />
+								<f:selectItem itemLabel="34" itemValue="34" />
+								<f:selectItem itemLabel="35" itemValue="35" />
+								<f:selectItem itemLabel="36" itemValue="36" />
+								<f:selectItem itemLabel="37" itemValue="37" />
+								<f:selectItem itemLabel="38" itemValue="38" />
+								<f:selectItem itemLabel="39" itemValue="39" />
+
+								<p:ajax event="change" global="false" />
+							</p:selectOneMenu>
+
+							<p:outputLabel for="pos" value="Posición"></p:outputLabel>
+							<p:inputText id="pos"
+								style="font-weight: 700;font-size: 15px;line-height: 1.0;width: 100%;"
+								value="#{ubicacionBean.posicion}" />
+
+							<p:outputLabel for="alt" value="Altura"></p:outputLabel>
+							<p:selectOneMenu id="alt" value="#{ubicacionBean.altura}"
+								filter="true" effect="fade" style="width:100%!important"
+								onkeyup="value=value.toUpperCase()">
+								<f:selectItem itemLabel="1" itemValue="1" />
+								<f:selectItem itemLabel="2" itemValue="2" />
+								<f:selectItem itemLabel="3" itemValue="3" />
+								<f:selectItem itemLabel="4" itemValue="4" />
+							</p:selectOneMenu>
+
+						</p:panelGrid>
+
+						<p:outputPanel style="text-align: right;">
+							<p:commandButton value="Asignar" id="botonIns"
+								actionListener="#{ubicacionBean.guardarAsignacion()}"
+								styleClass="btn-flat btn-success" icon="fa fa-check"
+								update="asignarUbicacionForm:panelData"
+								style="width: 200px;height: 35px;">
+							</p:commandButton>
+						</p:outputPanel>
+					</p:panel>
+
+
+				</h:form>
+			</div>
+		</ui:define>
+	</ui:composition>
+
+</h:body>
+</html>

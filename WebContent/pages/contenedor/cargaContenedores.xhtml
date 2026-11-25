@@ -1,0 +1,245 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+	xmlns:adm="http://github.com/adminfaces">
+
+<h:head>
+
+</h:head>
+<body>
+	<ui:composition template="/index.xhtml">
+		<ui:define name="content-begin">
+			<div>
+				<ui:insert name="content">
+					<p:panel id="panel3" header="Subir Programación Contenedor"
+						styleClass="card no-border">
+						<p:messages id="mensajes1" closable="true">
+							<p:autoUpdate />
+						</p:messages>
+
+						<h:form id="formTablaXls2" enctype="multipart/form-data">
+							<f:event type="preRenderView"
+								listener="#{contenedorBean.onLoad()}" />
+
+							<p:panelGrid columns="1" layout="grid">
+								<p:outputPanel style="text-align: right;width:100% !important">
+									<p:commandButton id="plantillaCont"
+										styleClass="btn-flat btn-xs"
+										value="Plantilla Excel Contenedores" icon="fa fa-download"
+										actionListener="#{contenedorBean.descargarPlanillaContenedor()}" />
+									<p:tooltip for="plantillaCont"
+										value="Plantilla Excel Contenedores" />
+								</p:outputPanel>
+							</p:panelGrid>
+
+							<p:commandButton styleClass="btn-flat btn-primary btn-block"
+								ajax="false" id="descExcelCont" style="visibility: hidden;">
+								<p:fileDownload value="#{contenedorBean.plantillaExcel}" />
+							</p:commandButton>
+
+							<p:fileUpload mode="advanced" auto="true" style="font-size: 14px"
+								fileUploadListener="#{contenedorBean.leerExcel}"
+								dragDropSupport="true"
+								allowTypes="/(\.|\/)(xls|xlsx|XLS|XLSX)$/" sizeLimit="10000000"
+								invalidFileMessage="Tipo de archivo invalido"
+								fileLimitMessage="Solo se puede subir un archivo a la vez"
+								label="Buscar archivo" ajax="false"
+								update="editaContForm" />
+
+						</h:form>
+
+					</p:panel>
+
+					<p:spacer />
+					<h:form id="editaContForm">
+						<p:panel id="panel4" header="Contenedores Cargados"
+							visible="#{fn:length(contenedorBean.contenedores) gt 0}"
+							styleClass="card no-border">
+							<p:dataTable id="tblContenedor" var="lista" rowIndexVar="rowId"
+								editable="true" value="#{contenedorBean.contenedores}"
+								widgetVar="tblContenedorWV"
+								emptyMessage="No hay contenedores cargados."
+								style="text-align: center;">
+
+								<p:ajax event="rowEdit" process="@this"
+									listener="#{contenedorBean.cargaContenedor}" />
+
+								<p:column headerText="#" width="20">
+									<h:outputText value="#{rowId + 1}" />
+								</p:column>
+								<p:column headerText="Contenedor" width="40">
+									<p:cellEditor>
+										<f:facet name="output">
+											<h:outputText
+												value="#{lista.container.equals('null') ?  ''  : lista.container}" />
+										</f:facet>
+										<f:facet name="input">
+											<p:inputText value="#{lista.container}" style="width:100%" />
+										</f:facet>
+									</p:cellEditor>
+								</p:column>
+
+								<p:column headerText="Viaje" width="40">
+									<p:cellEditor>
+										<f:facet name="output">
+											<h:outputText
+												value="#{lista.voyage.equals('null') ?  ''  : lista.voyage}" />
+										</f:facet>
+										<f:facet name="input">
+											<p:inputText value="#{lista.voyage}" style="width:100%" />
+										</f:facet>
+									</p:cellEditor>
+								</p:column>
+
+								<p:column headerText="Nave" width="50">
+									<p:cellEditor>
+										<f:facet name="output">
+											<h:outputText
+												value="#{lista.ship.equals('null') ?  ''  : lista.ship}" />
+										</f:facet>
+										<f:facet name="input">
+											<p:inputText value="#{lista.ship}" style="width:100%" />
+										</f:facet>
+									</p:cellEditor>
+								</p:column>
+
+								<p:column headerText="Pallet x Cont." width="30">
+									<p:cellEditor>
+										<f:facet name="output">
+											<h:outputText
+												value="#{lista.palletCont.equals('null') ?  ''  : lista.palletCont}" />
+										</f:facet>
+										<f:facet name="input">
+											<p:inputNumber value="#{lista.palletCont}" decimalPlaces="0"
+												style="width:100%" />
+										</f:facet>
+									</p:cellEditor>
+								</p:column>
+
+								<p:column headerText="Puerto" width="60">
+									<p:cellEditor>
+										<f:facet name="output">
+											<h:outputText
+												value="#{lista.puerto.equals('null') ?  ''  : lista.puerto}" />
+										</f:facet>
+										<f:facet name="input">
+											<p:inputText value="#{lista.puerto}" style="width:100%" />
+										</f:facet>
+									</p:cellEditor>
+								</p:column>
+
+								<p:column headerText="Tara" width="30">
+									<p:cellEditor>
+										<f:facet name="output">
+											<h:outputText
+												value="#{lista.tara.equals('null') ?  ''  : lista.tara}" />
+										</f:facet>
+										<f:facet name="input">
+											<p:inputNumber value="#{lista.tara}" decimalPlaces="0"
+												style="width:100%" />
+										</f:facet>
+									</p:cellEditor>
+								</p:column>
+
+								<p:column headerText="Importador" width="50">
+									<p:cellEditor>
+										<f:facet name="output">
+											<h:outputText
+												value="#{lista.importador.equals('null') ?  ''  : lista.importador}" />
+										</f:facet>
+										<f:facet name="input">
+											<p:inputText value="#{lista.importador}" style="width:100%" />
+										</f:facet>
+									</p:cellEditor>
+								</p:column>
+
+								<p:column headerText="Deposito" width="50">
+									<p:cellEditor>
+										<f:facet name="output">
+											<h:outputText
+												value="#{lista.deposito.equals('null') ?  ''  : lista.deposito}" />
+										</f:facet>
+										<f:facet name="input">
+											<p:inputText value="#{lista.deposito}" style="width:100%" />
+										</f:facet>
+									</p:cellEditor>
+								</p:column>
+
+								<p:column headerText="Tipo lista." width="50">
+									<p:cellEditor>
+										<f:facet name="output">
+											<h:outputText
+												value="#{lista.tipoCont.equals('null') ?  ''  : lista.tipoCont}" />
+										</f:facet>
+										<f:facet name="input">
+											<p:inputText value="#{lista.tipoCont}" style="width:100%" />
+										</f:facet>
+									</p:cellEditor>
+								</p:column>
+
+								<p:column headerText="File" width="50">
+									<p:cellEditor>
+										<f:facet name="output">
+											<h:outputText
+												value="#{lista.fille.equals('null') ?  ''  : lista.fille}" />
+										</f:facet>
+										<f:facet name="input">
+											<p:inputText value="#{lista.fille}" style="width:100%" />
+										</f:facet>
+									</p:cellEditor>
+								</p:column>
+
+								<p:column headerText="Booking" width="50">
+									<p:cellEditor>
+										<f:facet name="output">
+											<h:outputText
+												value="#{lista.booking.equals('null') ?  ''  : lista.booking}" />
+										</f:facet>
+										<f:facet name="input">
+											<p:inputText value="#{lista.booking}" style="width:100%" />
+										</f:facet>
+									</p:cellEditor>
+								</p:column>
+
+								<p:column style="width:35px">
+									<p:rowEditor />
+								</p:column>
+							</p:dataTable>
+						</p:panel>
+					</h:form>
+
+					<h:form id="confimaEditCont">
+						<p:dialog showEffect="fade" hideEffect="fade"
+							header="Confirmación" widgetVar="confimaeditC"
+							styleClass="card no-border" modal="true"
+							onHide="habilitarScroll()"
+							onShow="PF('confimaeditC').initPosition();"
+							position="center center" closable="false" resizable="false"
+							draggable="false">
+							<p:outputLabel
+								value="¿Desea editar el contenedor #{contenedorBean.contenedor.container}?"></p:outputLabel>
+							<br />
+							<br />
+							<p:outputPanel style="text-align: right;">
+								<p:commandButton value="Si" icon="fa fa-check" process="@this"
+									global="false"
+									styleClass="ui-confirmdialog-yes btn-flat btn-success"
+									actionListener="#{contenedorBean.actulizaContenedor()}">
+								</p:commandButton>
+								<p:commandButton value="No" type="button"
+									onclick="PF('confimaeditC').hide();"
+									styleClass="ui-confirmdialog-no btn-flat" icon="fa fa-close" />
+							</p:outputPanel>
+						</p:dialog>
+
+					</h:form>
+				</ui:insert>
+			</div>
+		</ui:define>
+	</ui:composition>
+</body>
+</html>

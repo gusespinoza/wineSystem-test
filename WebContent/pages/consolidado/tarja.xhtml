@@ -1,0 +1,71 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:of="http://omnifaces.org/functions"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:adm="http://github.com/adminfaces"
+	xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+	xmlns:c="http://java.sun.com/jsp/jstl/core">
+
+<h:outputStylesheet library="css" name="styles.css" />
+<h:head>
+	<title>Marval WineSystem</title>
+
+</h:head>
+
+<h:body id="body">
+
+	<ui:composition template="/index.xhtml">
+
+		<ui:define name="content-begin">
+			<style type="text/css">
+</style>
+			<p:ajaxStatus onstart="PF('statusDialog').show();"
+				onsuccess="PF('statusDialog').hide();" />
+
+			<div class="ui-flat">
+
+				<h:form onkeyup="if(event.keyCode == 13) return false;"
+					style="width:100%!important" id="formCargaPallet">
+
+					<f:event type="preRenderView" listener="#{consolidadoBean.onload()}" />
+
+					<p:panel id="panelTraspasoPallet" header="Consolidado"
+						style="width:100%!important" styleClass="card no-border">
+
+						<p:messages id="mensajes" for="mensajes" closable="true">
+						</p:messages>
+						<p:panelGrid columns="4" layout="grid"
+							columnClasses="ui-grid-col-3,ui-grid-col-3,ui-grid-col-3,ui-grid-col-3">
+
+							<p:selectOneMenu id="tipoFact" style="width:100%!important"
+								converter="omnifaces.SelectItemsConverter" 
+								value="#{consolidadoBean.contenedorSelected}">
+								<f:selectItem itemLabel="CONTENEDOR" itemValue="" />
+								<f:selectItems value="#{consolidadoBean.listContenedor.entrySet()}" var="cont" 
+									itemLabel="#{cont.value}" itemValue="#{cont.key}" />
+							</p:selectOneMenu>
+							<p:commandButton styleClass="btn btn-success btn-block"
+								value="Tarjar" icon="fa fa-fw fa-search"
+								style="width:100% !important"
+								actionListener="#{consolidadoBean.cargaPalletDisponibles()}">
+							</p:commandButton>
+						</p:panelGrid>
+						<p:outputPanel style="width:100%!important;text-align:right">
+					
+						</p:outputPanel>
+					</p:panel>
+
+				</h:form>
+
+
+
+
+
+			</div>
+		</ui:define>
+	</ui:composition>
+</h:body>
+</html>

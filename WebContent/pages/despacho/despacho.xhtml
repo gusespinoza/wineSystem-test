@@ -1,0 +1,301 @@
+ <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:of="http://omnifaces.org/functions"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+	xmlns:adm="http://github.com/adminfaces">
+
+<h:head>
+	<script type="text/javascript">
+    PrimeFaces.locales['es'] = {
+        closeText: 'Cerrar',
+        prevText: 'Anterior',
+        nextText: 'Siguiente',
+        monthNames: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
+        monthNamesShort: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'],
+        dayNames: ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'],
+        dayNamesShort: ['Dom', 'Lun', 'Mar', 'Mie', 'Jue', 'Vie', 'Sab'],
+        dayNamesMin: ['D', 'L', 'M', 'X', 'J', 'V', 'S'],
+        weekHeader: 'Semana',
+        firstDay: 1,
+        isRTL: false,
+        showMonthAfterYear: false,
+        yearSuffix: '',
+        timeOnlyTitle: 'Sólo hora',
+        timeText: 'Tiempo',
+        hourText: 'Hora',
+        minuteText: 'Minuto',
+        secondText: 'Segundo',
+        millisecondText: 'Milisegundo',
+        currentText: 'Fecha actual',
+        ampm: false,
+        month: 'Mes',
+        week: 'Semana',
+        day: 'Día',
+        allDayText: 'Todo el día',
+        today: 'Hoy',
+        clear: 'Claro'
+    };
+</script>
+</h:head>
+<body>
+	<ui:composition template="/index.xhtml">
+		<ui:define name="content-begin">
+			<div>
+				<ui:insert name="content">
+					<p:panel id="etiqueta" styleClass="card no-border">
+
+						<p:panelGrid columns="6" layout="grid" id="panelManif"
+							columnClasses="ui-grid-col-2,ui-grid-col-6, ui-grid-col-2,ui-grid-col-4, ui-grid-col-2, ui-grid-col-2">
+							<p:outputLabel value="Contenedor:" />
+							<p:outputLabel
+								style="font-weight:bold; font-size: 25px; line-height: 1.2;"
+								value="#{despachoBean.contenedor.container}" />
+							<p:outputLabel value="Cajas:" />
+							<p:outputLabel
+								style="font-weight:bold; font-size: 25px; line-height: 1.2;"
+								value="#{despachoBean.cajas}" />
+							<p:outputLabel value="Pallets:" />
+							<p:outputLabel
+								style="font-weight:bold; font-size: 25px; line-height: 1.2;"
+								value="#{despachoBean.pallets}" />
+						</p:panelGrid>
+
+						<hr />
+
+						<p:panelGrid columns="4" layout="grid" id="panelManifDet"
+							columnClasses="ui-grid-col-2,ui-grid-col-4, ui-grid-col-2, ui-grid-col-4,">
+
+							<p:outputLabel value="Tara:" />
+							<p:outputLabel
+								style="font-weight:bold; font-size: 15px; line-height: 1;width: 100%;"
+								value="#{despachoBean.contenedor.tara}" />
+
+							<p:outputLabel value="Sello:" />
+							<p:outputLabel
+								style="font-weight:bold; font-size: 15px; line-height: 1;width: 100%;"
+								value="#{despachoBean.contenedor.sello}" />
+							<p:outputLabel value="Nave:" />
+							<p:outputLabel
+								style="font-weight:bold; font-size: 15px; line-height: 1;width: 100%;"
+								value="#{despachoBean.contenedor.ship}" />
+							<p:outputLabel value="Viaje:" />
+							<p:outputLabel
+								style="font-weight:bold; font-size: 15px; line-height: 1;width: 100%;"
+								value="#{despachoBean.contenedor.voyage}" />
+
+							<p:outputLabel value="Puerto:" />
+							<p:outputLabel
+								style="font-weight:bold; font-size: 15px; line-height: 1;width: 100%;"
+								value="#{despachoBean.contenedor.puerto}" />
+
+							<p:outputLabel value="Fecha Consolidado:" />
+							<p:outputLabel
+								style="font-weight:bold; font-size: 15px; line-height: 1;width: 100%;"
+								value="#{of:formatDate(despachoBean.contenedor.fechaConsolidado, 'dd-MM-yyyy')}" />
+							<p:outputLabel value="Inicio Consolidado" />
+							<p:outputLabel
+								style="font-weight:bold; font-size: 15px; line-height: 1;width: 100%;"
+								value="#{of:formatDate(despachoBean.contenedor.iniConsolidado, 'HH:mm')}" />
+							<p:outputLabel value="Fin Consolidado" />
+							<p:outputLabel
+								style="font-weight:bold; font-size: 15px; line-height: 1;width: 100%;"
+								value="#{of:formatDate(despachoBean.contenedor.finConsolidado, 'HH:mm')}" />
+							<p:outputLabel value="Docuemnto:" />
+							<p:outputLabel
+								style="font-weight:bold; font-size: 15px; line-height: 1;width: 100%;"
+								value="#{despachoBean.contenedor.tipoDocu}" />
+							<p:outputLabel value="Nro Documento:" />
+							<p:outputLabel
+								style="font-weight:bold; font-size: 15px; line-height: 1;width: 100%;"
+								value="#{despachoBean.contenedor.numeroDoc}" />
+							<p:outputLabel value="Fecha Documento:" />
+							<p:outputLabel
+								style="font-weight:bold; font-size: 15px; line-height: 1;width: 100%;"
+								value="#{of:formatDate(despachoBean.contenedor.fechaDoc, 'dd-MM-yyyy')}" />
+						</p:panelGrid>
+
+					</p:panel>
+
+					<p:spacer />
+
+					<h:form id="ptForm">
+						<p:panel id="panelPt" header="Carga "
+							styleClass="ui-fluid card no-border"
+							visible="#{fn:length(despachoBean.listContDespacho) gt 0}">
+
+							<p:toolbar>
+								<p:toolbarGroup align="right">
+									<p:commandButton id="btnDespachar" resetValues="true"
+										actionListener="#{despachoBean.comprobarPt()}" global="false"
+										value="Despachar" icon="fa fa-plus"
+										styleClass="btn btn-success" process="@this"
+										style="width:200px;" />
+								</p:toolbarGroup>
+							</p:toolbar>
+
+							<br />
+
+							<p:dataTable id="tablaAsignacion" var="pt" rowIndexVar="rowIdx"
+								widgetVar="tblAsignacion" global="false" editable="true" paginatorPosition="bottom"
+								value="#{despachoBean.listaPt}" reflow="true" paginator="true"
+								rows="50" emptyMessage="No hay etiquetas asociadas"
+								selection="#{despachoBean.ptSelected}" rowKey="#{pt.id}"
+								style="text-align: center;">
+								<p:ajax event="rowEdit" process="@this"
+									listener="#{despachoBean.cargaPt}" />
+								<p:ajax event="toggleSelect" update="@form" />
+								<p:ajax event="rowSelectRadio" update="@form"
+									listener="#{despachoBean.autoAgregarEtiquetas()}" />
+								<p:column selectionMode="single"
+									style="width:10px;text-align:center">
+								</p:column>
+								<p:column width="10" headerText="#">
+									<p:outputLabel value="#{rowIdx + 1}" />
+								</p:column>
+								<p:column headerText="Orden Venta" width="15">
+									<h:outputText value="#{pt.salesOrderId}" />
+								</p:column>
+								<p:column headerText="Ord. Ref." width="20">
+									<h:outputText value="#{pt.ordenReference}" />
+								</p:column>
+								<p:column headerText="Viña" width="20">
+									<h:outputText value="#{pt.ownerId}" />
+								</p:column>
+								<p:column headerText="Producto" width="20">
+									<h:outputText value="#{pt.productNumber}" />
+								</p:column>
+
+								<p:column headerText="Cosecha" width="20">
+									<p:cellEditor>
+										<f:facet name="output">
+											<h:outputText value="#{pt.lotNumber}" />
+										</f:facet>
+										<f:facet name="input">
+											<p:inputText value="#{pt.lotNumber}" style="width:100%" />
+										</f:facet>
+									</p:cellEditor>
+								</p:column>
+
+								<p:column headerText="Un. a Emb. " width="20">
+									<p:cellEditor>
+										<f:facet name="output">
+											<h:outputText value="#{pt.orderQuantity}" />
+										</f:facet>
+										<f:facet name="input">
+											<p:inputText value="#{pt.orderQuantity}" style="width:100%" />
+										</f:facet>
+									</p:cellEditor>
+								</p:column>
+								<p:column headerText="Importador" width="40">
+									<h:outputText value="#{pt.shipToName}" />
+								</p:column>
+							</p:dataTable>
+
+						</p:panel>
+						<p:spacer />
+
+						<p:panel id="panelPo" header="Carga Consolidada"
+							styleClass="ui-fluid card no-border"
+							visible="#{fn:length(despachoBean.listContDespacho) gt 0}">
+							
+							<p:panelGrid columns="6" layout="grid" id="panelManif"
+										columnClasses="ui-grid-col-2, ui-grid-col-2, ui-grid-col-2, ui-grid-col-2, ui-grid-col-2, ui-grid-col-2">
+
+										<p:outputLabel style="font-weight:bold; font-size: 15px; "
+											value="Unidades Seleccionadas: #{despachoBean.cajasSelected}" />
+
+									</p:panelGrid>
+									
+							<p:dataTable id="tblPo" var="dc" rowIndexVar="rowIdx"
+								selection="#{despachoBean.cDSelected}" 
+								value="#{despachoBean.listContDespacho}" reflow="true"
+								paginator="false" rows="40" rowKey="#{dc.id}"
+								style="text-align: center;">
+
+								<p:ajax event="toggleSelect" update="@form" listener="#{despachoBean.contarUnidades()}" />
+								<p:ajax event="rowSelectCheckbox" update="@form" listener="#{despachoBean.contarUnidades()}"/>
+								<p:ajax event="rowUnselectCheckbox" update="@form" listener="#{despachoBean.contarUnidades()}" />}
+								
+
+								<p:column selectionMode="multiple"
+									style="width:50px;text-align:center">
+								</p:column>
+								<p:column width="15" headerText="#">
+									<p:outputLabel value="#{rowIdx + 1}" />
+								</p:column>
+								<p:column headerText="Pallet" width="100">
+									<h:outputText value="#{dc.pallet}" />
+								</p:column>
+								<p:column headerText="Orden Referencia" width="100">
+									<h:outputText value="#{dc.ordenReferencia}" />
+								</p:column>
+								<p:column headerText="Viña" width="150">
+									<h:outputText value="#{dc.vina}" />
+								</p:column>
+								<p:column headerText="Producto" width="220">
+									<h:outputText value="#{dc.producto}" />
+								</p:column>
+								<p:column headerText="Cod. Prod." width="100">
+									<h:outputText value="#{dc.numeroProducto}" />
+								</p:column>
+								<p:column headerText="Cosecha" width="80">
+									<h:outputText value="#{dc.cosecha}" />
+								</p:column>
+								<p:column headerText="Cajas Recepcionadas" width="100">
+									<h:outputText value="#{dc.cajasRecepcionadas}" />
+								</p:column>
+								<p:column headerText="Cajas Consolidadas" width="100">
+									<h:outputText value="#{dc.cajasConsolidas}" />
+								</p:column>
+								<p:column headerText="Fecha Recepción" width="100">
+									<h:outputText
+										value="#{of:formatDate(dc.fechaRecepcion, 'dd-MM-yyyy')}" />
+								</p:column>
+								<p:column headerText="Tipo Recepcion" width="100">
+									<h:outputText value="#{dc.tipoRecepcion}" />
+								</p:column>
+							</p:dataTable>
+						</p:panel>
+
+					</h:form>
+					
+					<p:remoteCommand name="mod"
+						actionListener="#{despachoBean.despachar()}"></p:remoteCommand>
+					
+
+					<h:form id="confimaeditPt">
+						<p:dialog showEffect="fade" hideEffect="fade"
+							header="Confirmación" widgetVar="confimaeditPt"
+							styleClass="card no-border" modal="true"
+							onHide="habilitarScroll()"
+							onShow="PF('confimaeditPt').initPosition();"
+							position="center center" closable="false" resizable="false"
+							draggable="false">
+							<p:outputLabel
+								value="¿Desea editar el Picking Ticket #{despachoBean.ptSelected.salesOrderId}?"></p:outputLabel>
+							<br />
+							<br />
+							<p:outputPanel style="text-align: right;">
+								<p:commandButton value="Si" icon="fa fa-check" process="@this"
+									global="false"
+									styleClass="ui-confirmdialog-yes btn-flat btn-success"
+									actionListener="#{despachoBean.actualizarPt()}">
+								</p:commandButton>
+								<p:commandButton value="No" type="button"
+									onclick="PF('confimaeditPt').hide();"
+									styleClass="ui-confirmdialog-no btn-flat" icon="fa fa-close" />
+							</p:outputPanel>
+						</p:dialog>
+
+					</h:form>
+
+				</ui:insert>
+			</div>
+		</ui:define>
+	</ui:composition>
+</body>
+</html>

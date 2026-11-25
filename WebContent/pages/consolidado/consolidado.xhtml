@@ -1,0 +1,251 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:of="http://omnifaces.org/functions"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:adm="http://github.com/adminfaces"
+	xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+	xmlns:c="http://java.sun.com/jsp/jstl/core">
+
+<h:outputStylesheet library="css" name="styles.css" />
+<h:head>
+	<title>Marval Wine</title>
+
+</h:head>
+
+<h:body id="body">
+
+	<ui:composition template="/index.xhtml">
+
+		<ui:define name="content-begin">
+			<style type="text/css">
+.non-selected-button-background-color {
+	background-color: blue;
+	background: blue;
+}
+
+.selected-button-background-color {
+	background-color: green;
+	background: blue;
+}
+
+.styleFilterCommandButton-BackgroundColor, .ui-widget-content .styleFilterCommandButton-BackgroundColor,
+	.ui-widget-header .styleFilterCommandButton-BackgroundColor* {
+	background-image: none;
+	background-color: #ee4400;
+}
+</style>
+			<p:ajaxStatus onstart="PF('statusDialog').show();"
+				onsuccess="PF('statusDialog').hide();" />
+			<script type="text/javascript">
+    function handleDrop(event, ui) {
+        var droppedCar = ui.draggable;
+ 
+        droppedCar.fadeOut('fast');
+    }
+</script>
+			<div class="ui-flat">
+
+				<h:form onkeyup="if(event.keyCode == 13) return false;"
+					id="formTarjadoPalet">
+
+
+					<p:panel id="panelTraspasoPallet" header="Consolidado"
+						styleClass="card no-border">
+
+
+						<p:panelGrid columns="2" id="gridContenedor" layout="grid"
+							style="width:100%!important;">
+							<p:outputLabel value="Contenedor" />
+							<p:inputText readonly="true"
+								value="#{consolidadoBean.contenedor.container}"
+								style="width:100%!important;" />
+
+							<p:outputLabel value="Viaje" />
+							<p:inputText readonly="true"
+								value="#{consolidadoBean.contenedor.voyage}"
+								style="width:100%!important;" />
+
+							<p:outputLabel value="Nave" />
+							<p:inputText readonly="true"
+								value="#{consolidadoBean.contenedor.ship}"
+								style="width:100%!important;" />
+
+
+							<p:outputLabel value="Importador" />
+							<p:inputText readonly="true"
+								value="#{consolidadoBean.contenedor.importador}"
+								style="width:100%!important;" />
+
+
+							<p:outputLabel value="Puerto Destino" />
+							<p:inputText readonly="true"
+								value="#{consolidadoBean.contenedor.puerto}"
+								style="width:100%!important;" />
+
+
+							<p:outputLabel value="Deposito" />
+							<p:inputText readonly="true"
+								value="#{consolidadoBean.contenedor.deposito}"
+								style="width:100%!important;" />
+
+						</p:panelGrid>
+						<p:spacer height="8" />
+						<p:messages id="mensajes" closable="true">
+						</p:messages>
+
+						<p:panelGrid columns="2"
+							style="width:100%!important;text-align: top;border-style:none;">
+							<p:panel header="Pallets Asignados" style="border-style:none;">
+								<p:dataGrid var="palletAsig"
+									value="#{consolidadoBean.listAsignaciones}" columns="2"
+									id="palletAsig">
+									<p:splitButton
+										styleClass="btn btn-xs #{consolidadoBean.cambiaClaseBoton(palletAsig)}"
+										value="#{palletAsig.etiqueta.nroEtiqueta} / #{palletAsig.etiqueta.cajasPallet}"
+										style="width:90%!important;#{consolidadoBean.cambiaColor(palletAsig)}"
+										global="false"
+										actionListener="#{consolidadoBean.asignaPallet(palletAsig)}">
+
+										<p:menuitem value="Mostrar etiquetas"
+											actionListener="#{consolidadoBean.mostrarEtiquetas(palletAsig.etiquetas)}" styleClass="btn btn-xs btn-info"
+											containerStyle="width:100%!important;"
+											 />
+
+
+									</p:splitButton>
+								</p:dataGrid>
+							</p:panel>
+
+							<p:panel header="Pallets Disponibles" style="border-style:none;">
+								<p:dataGrid var="palletDisp"
+									rowIndexVar="#{palletDisp.posicion}"
+									value="#{consolidadoBean.listAsignacionesDisponibles}"
+									columns="1" id="palletDisp"
+									emptyMessage="Sin Pallets Disponibles">
+
+
+									<p:commandButton styleClass="btn btn-success btn-xs"
+										value="#{palletDisp.etiqueta.nroEtiqueta} - #{palletDisp.etiqueta.cajasPallet}"
+										global="false"
+										style="font-size:110%;width:100%!important;#{consolidadoBean.cambiaColor(palletDisp)}"
+										actionListener="#{consolidadoBean.asignaPalletDisponible(palletDisp)}">
+									</p:commandButton>
+
+								</p:dataGrid>
+							</p:panel>
+						</p:panelGrid>
+						<p:panelGrid columns="1"
+							style="width:100%!important;text-align: top;border-style:none;">
+						</p:panelGrid>
+						<p:spacer height="8" />
+						<p:panel header="RESUMEN" style="border-style:none;">
+							<p:panelGrid columns="2" id="gridTotales" layout="grid"
+								style="width:100%!important;border-style:none;">
+
+
+								<p:outputLabel value="Total Cajas" />
+								<p:inputText readonly="true"
+									value="#{consolidadoBean.totalCajas}"
+									style="width:100%!important;" />
+
+								<p:outputLabel value="Total Pallets" />
+								<p:inputText readonly="true"
+									value="#{consolidadoBean.totalPallets}"
+									style="width:100%!important;" />
+
+								<p:outputLabel value="Observaciones" />
+								<p:selectOneMenu value="#{consolidadoBean.observaciones}"
+									style="width:100% !important" label="origen">
+									<p:ajax listener="#{consolidadoBean.validaObservacion()}"
+										global="false" />
+									<f:selectItems value="#{consolidadoBean.observacionesSelect()}"
+										var="manActi" />
+								</p:selectOneMenu>
+							</p:panelGrid>
+						</p:panel>
+						<p:panelGrid columns="1" layout="grid" id="gridInput"
+							style="width:100%!important;border-style:none;">
+							<p:inputTextarea rows="3" cols="65" id="observaciones"
+								rendered="#{consolidadoBean.muestraObservacion}"
+								style="width:100% !important" maxlength="750"
+								value="#{consolidadoBean.observacionesOtra}">
+								<p:ajax event="keyup" global="false" />
+							</p:inputTextarea>
+							<p:commandButton styleClass="btn btn-success" value="Guardar"
+								action="#{consolidadoBean.guardarTarja()}"
+								style="width:100%!important" icon="fa fa-check">
+							</p:commandButton>
+							<p:commandButton styleClass="btn" value="Cancelar"
+								action="#{consolidadoBean.volver()}"
+								style="width:100%!important" icon="fa fa-close">
+							</p:commandButton>
+						</p:panelGrid>
+					</p:panel>
+
+					<p:dialog widgetVar="selloModal" modal="true" draggable="false"
+						id="selloModalId" onHide="habilitarScroll();" showHeader="false"
+						position="center center" onShow="PF('selloModal').initPosition();"
+						hideEffect="fade" styleClass="box-success" showEffect="fade"
+						resizable="false" height="auto" width="70%"
+						style="background-color:#F0F0F0;">
+						<div class="ui-flat">
+							<p:messages id="mSello" closable="true">
+							</p:messages>
+							<p:panel id="igrsoSello" styleClass="card no-border"
+								header="Confirmar Sello">
+								<p:spacer height="3" />
+								<p:panelGrid columns="4" layout="grid"
+									style="width:100% !important;">
+
+									<p:inputText value="#{consolidadoBean.selloCia}"
+										onkeyup="value=value.toUpperCase()"
+										style="width:100%!important" placeholder="Sello">
+										<p:ajax event="keyup" global="false" />
+									</p:inputText>
+
+									<p:inputNumber value="#{consolidadoBean.airbag}"
+										decimalSeparator="0" placeholder="AIRBAG"
+										inputStyle="width:100%!important" />
+
+									<p:commandButton styleClass="btn btn-success" value="Aceptar"
+										action="#{consolidadoBean.validarSello()}"
+										style="width:100%!important" icon="fa fa-check">
+									</p:commandButton>
+									<p:commandButton styleClass="btn" value="Cancelar"
+										onclick="PF('selloModal').hide()" type="button"
+										style="width:100%!important" icon="fa fa-close">
+									</p:commandButton>
+								</p:panelGrid>
+							</p:panel>
+						</div>
+					</p:dialog>
+					<p:dialog widgetVar="etiquetasModal" modal="true" draggable="false"
+						id="etiquetaModalId" onHide="habilitarScroll();"
+						showHeader="true" position="center" closable="true" closeOnEscape="true"
+						onShow="PF('etiquetasModal').initPosition();" hideEffect="fade"
+						styleClass="box-success" showEffect="fade" resizable="false"
+						height="auto" width="40%" style="background-color:#F0F0F0;">
+						<div class="ui-flat">
+							<p:panel id="panelEti" styleClass="card no-border"
+								header="Etiquetas agrupadas">
+								<p:dataTable value="#{consolidadoBean.etiquetasDialogo}" 
+									var="eti">
+									<p:column headerText="Etiqueta" width="20" >
+										<h:outputText value="#{eti.nroEtiqueta}" />
+									</p:column>
+									<p:column headerText="Cajas" width="20">
+										<h:outputText value="#{eti.cajasPallet}" />
+									</p:column>
+								</p:dataTable>
+							</p:panel>
+						</div>
+					</p:dialog>
+				</h:form>
+			</div>
+		</ui:define>
+	</ui:composition>
+</h:body>
+</html>

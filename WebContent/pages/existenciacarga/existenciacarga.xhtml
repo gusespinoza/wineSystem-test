@@ -1,0 +1,278 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:of="http://omnifaces.org/functions"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:adm="http://github.com/adminfaces"
+	xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:pe="http://primefaces.org/ui/extensions">
+
+
+<h:head>
+	<title>Marval AEP</title>
+	<link rel="stylesheet" href="style.css"></link>
+
+</h:head>
+
+<h:body id="body">
+
+	<ui:composition template="/index.xhtml">
+
+		<ui:define name="content-begin">
+			<p:ajaxStatus onstart="PF('statusDialog').show();"
+				onsuccess="PF('statusDialog').hide();" />
+
+			<div class="ui-flat">
+
+				<h:form id="formExistencia">
+
+					<f:event type="preRenderView"
+						listener="#{existenciaCargaBean.onLoad()}" />
+
+					<p:panel id="ubicacion" header="Existencia de Carga"
+						styleClass="card no-border">
+
+						<p:panelGrid columns="4" layout="grid"
+							columnClasses="ui-grid-col-3,ui-grid-col-3,ui-grid-col-3,ui-grid-col-3">
+
+							<p:autoComplete maxlength="30" placeholder="VIÑA"
+								scrollHeight="200" style="width:100%;"
+								inputStyle="width:100%!important" forceSelection="false"
+								value="#{existenciaCargaBean.vinaSelec}" minQueryLength="4"
+								completeMethod="#{existenciaCargaBean.autoCompletarVinas}"
+								effect="fade">
+								<p:ajax event="keyup" global="false" />
+								<p:ajax event="query" />
+								<p:ajax event="itemSelect" global="false" update="order fert puO" />
+
+							</p:autoComplete>
+							
+							<p:inputText id="fert" placeholder="FERT"
+								disabled="#{existenciaCargaBean.vinaSelec eq ''}"
+								value="#{existenciaCargaBean.fert}"
+								style="width:100% !important"
+								></p:inputText>
+								
+							<p:autoComplete maxlength="30" placeholder="P.O." id="puO"
+								scrollHeight="200" style="width:100%;"
+								disabled="#{existenciaCargaBean.vinaSelec eq ''}"
+								inputStyle="width:100%!important" forceSelection="false"
+								value="#{existenciaCargaBean.po}" minQueryLength="4"
+								completeMethod="#{existenciaCargaBean.autocompletarPOS}"
+								effect="fade">
+								<p:ajax event="keyup" global="false" />
+								<p:ajax event="query" />
+							</p:autoComplete>
+							
+							<p:commandButton styleClass="btn btn-success btn-block"
+								id="buscar" value="Buscar" icon="fa fa-search"
+								update="existenciaRes"
+								actionListener="#{existenciaCargaBean.buscarCargas()}">
+							</p:commandButton>
+							
+							
+							<p:selectOneMenu id="order"
+								disabled="#{existenciaCargaBean.vinaSelec eq ''}"
+								value="#{existenciaCargaBean.orden}"
+								style="width:100% !important" inputStyle="width:100%!important">
+								<f:selectItem itemValue="" itemLabel="SELECCIONAR ORDEN" />
+								<f:selectItem itemValue="FECHA_REC"
+									itemLabel="FECHA DE RECEPCION" />
+								<f:selectItem itemValue="UBICACION" itemLabel="UBICACION" />
+								<f:selectItem itemValue="HISTORICO" itemLabel="HISTORICO" />
+								<f:selectItem itemValue="DISPONIBLE" itemLabel="DISPONIBLE" />
+								<f:selectItem itemValue="STOCK COMPLETO" itemLabel="STOCK COMPLETO" />
+								<p:ajax event="change" process="@this" update="ubicacion"></p:ajax>
+							</p:selectOneMenu>
+							
+							
+							<p:calendar id="fechaDesde" style="width:100% !important"
+								rendered="#{existenciaCargaBean.orden eq 'HISTORICO'}"
+								widgetVar="fechaDesdeWV" showOn="button"
+								placeholder="FECHA DESPACHO DESDE" inputStyle="width:100% !important"
+								onclick="PF('fechaDesdeWV').jqEl.datetimepicker('show');return false;"
+								value="#{existenciaCargaBean.fechaDesde}" pattern="dd-MM-yyyy"
+								locale="es">
+								<p:ajax event="dateSelect" update="@this fechaHasta" listener="#{existenciaCargaBean.fechaMax()}"></p:ajax>
+							</p:calendar>
+							
+							<p:calendar id="fechaHasta" style="width:100% !important"
+								rendered="#{existenciaCargaBean.orden eq 'HISTORICO'}"
+								showOn="button" inputStyle="width:100% !important" maxdate="#{existenciaCargaBean.fechaMaxima}"
+								widgetVar="fechaHastaWV" placeholder="FECHA DESPACHO HASTA"
+								onclick="PF('fechaHastaWV').jqEl.datetimepicker('show');return false;"
+								value="#{existenciaCargaBean.fechaHasta}" pattern="dd-MM-yyyy"
+								locale="es">
+								<p:ajax event="change" update="@this"></p:ajax>
+							</p:calendar>
+
+							
+
+						</p:panelGrid>
+
+
+					</p:panel>
+
+					<br></br>
+
+
+
+					<p:panel id="existenciaRes" styleClass="card no-border"
+						visible="#{fn:length(existenciaCargaBean.listaCargas) gt 0}">
+
+
+						<p:dataTable id="tablaCont" widgetVar="tablaContWV"
+							style="text-align: center;" var="cont" rowIndexVar="rowId"
+							paginator="true" editable="true" paginatorPosition="bottom"
+							emptyMessage="No existen cargas para mostrar."
+							value="#{existenciaCargaBean.listaCargas}" 
+							filteredValue="#{existenciaCargaBean.listaCargasAux}" rows="30"
+							rowKey="#{cont.id}">
+
+							<f:facet name="header">
+								<p:panelGrid columns="3" styleClass="ui-noborder"
+									id="panelTabla" columnClasses="ui-grid-col-12,ui-grid-col-4,ui-grid-col-4"
+									style="height:45px;">
+									<p:outputPanel style="text-align: left;">
+										
+										<p:outputLabel
+											style="font-weight: 700;font-size: 15px;line-height: 1.0;"
+											value="#{fn:length(existenciaCargaBean.listaCargas)} etiquetas encontradas." />
+											</p:outputPanel>
+									<p:outputPanel style="text-align: right;">
+										<p:inputText maxlength="35" autocomplete="off"
+											id="globalFilter"
+											onkeypress="if(event.keyCode == 13) return false"
+											placeholder="Buscar..."
+											style="width: 190px;height: 40px;font-size: 16px;">
+											<f:ajax event="keyup" delay="800"
+												onevent="function(data){if(data.status=='success') PF('tablaContWV').filter();}" />
+										</p:inputText>
+										
+									</p:outputPanel>
+									<p:outputPanel style="text-align: right;">
+										
+										<p:commandButton styleClass="btn-flat btn-success"
+											value="Excel" disabled="#{!(fn:length(existenciaCargaBean.listaCargas) gt 0)}"
+											ajax="false" id="descExcel" style="width: 200px;">
+											<p:fileDownload value="#{existenciaCargaBean.generarExcelExistencia()}" />
+										</p:commandButton>
+									</p:outputPanel>
+								</p:panelGrid>
+							</f:facet>
+
+							<p:column width="30" headerText="#">
+								<p:outputLabel value="#{rowId + 1}" />
+							</p:column>
+
+							<p:column filterBy="#{cont.etiqueta}" headerText="Etiqueta"
+								width="80" filterStyle="display:none" filterMatchMode="contains">
+								<p:outputLabel
+									value="#{cont.etiqueta}" />
+							</p:column>
+
+							<!-- <p:column filterBy="#{cont.vina}" headerText="Viña" width="100"
+								filterStyle="display:none" filterMatchMode="contains">
+								<p:outputLabel
+									style="font-weight: 700;font-size: 15px;line-height: 1.0;"
+									value="#{cont.vina}" />
+							</p:column -->>
+							<p:column filterBy="#{cont.codigoProducto}"
+								headerText="Código Producto" width="100"
+								filterStyle="display:none" filterMatchMode="contains">
+								<p:outputLabel
+									value="#{cont.codigoProducto}" />
+							</p:column>
+							<!--  <p:column filterBy="#{cont.producto}" headerText="Producto"
+								width="150" filterStyle="display:none"
+								filterMatchMode="contains" rendered="#{(existenciaCargaBean.orden ne 'HISTORICO')}">
+								<p:outputLabel
+									style="font-weight: 700;font-size: 15px;line-height: 1.0;"
+									value="#{cont.producto}" />
+							</p:column>-->
+							<p:column filterBy="#{cont.cosecha}" headerText="Cosecha"
+								width="50" filterStyle="display:none" filterMatchMode="contains">
+								<p:outputLabel
+									value="#{cont.cosecha}" />
+							</p:column>
+							<p:column filterBy="#{cont.botellasPorCaja}" rendered="#{(existenciaCargaBean.orden ne 'HISTORICO')}"
+								headerText="Bot / Caja" width="45"
+								filterStyle="display:none" filterMatchMode="contains">
+								<p:outputLabel
+									value="#{cont.botellasPorCaja}" />
+							</p:column>
+							<p:column filterBy="#{cont.cajasPallet}"
+								headerText="Cajas / Pallet" width="45"
+								filterStyle="display:none" filterMatchMode="contains">
+								<p:outputLabel
+									value="#{cont.cajasPallet}" />
+							</p:column>
+							<p:column filterBy="#{cont.guiaCliente}"
+								headerText="Guía Cliente" width="60" filterStyle="display:none"
+								filterMatchMode="contains">
+								<p:outputLabel
+									value="#{cont.guiaCliente}" />
+							</p:column>
+
+							<p:column filterBy="#{cont.fechaRecepcion}"
+								headerText="Fecha Recepción" width="60"
+								filterStyle="display:none" filterMatchMode="contains">
+								<h:outputText
+									value="#{of:formatDate(cont.fechaRecepcion, 'dd-MM-yyyy')}" />
+							</p:column>
+							
+							<p:column filterBy="#{cont.codigo_fert}"
+								headerText="FERT" width="75"
+								filterStyle="display:none" filterMatchMode="contains">
+								<h:outputText
+									value="#{cont.codigo_fert}" />
+							</p:column>
+							
+							<p:column filterBy="#{cont.poId}"
+								headerText="P.O." width="45"
+								filterStyle="display:none" filterMatchMode="contains">
+								<h:outputText
+									value="#{cont.poId}" />
+							</p:column>
+							
+							<p:column filterBy="#{cont.ubicacion}" headerText="Ubicación" rendered="#{(existenciaCargaBean.orden ne 'DISPONIBLE')}"
+								width="60" filterStyle="display:none" filterMatchMode="contains">
+								<p:outputLabel
+									value="#{cont.ubicacion}" />
+							</p:column>
+							
+							<p:column  headerText="Contenedor / Movimiento" 
+								rendered="#{(existenciaCargaBean.orden ne 'DISPONIBLE' and existenciaCargaBean.orden ne 'STOCK COMPLETO' and existenciaCargaBean.orden ne 'UBICACION')}"
+								width="90" >
+								<p:outputLabel
+									value="#{cont.contenedor}" />
+							</p:column>
+							
+							<p:column filterBy="#{cont.fechaDespacho}" 
+								rendered="#{(existenciaCargaBean.orden ne 'DISPONIBLE' and existenciaCargaBean.orden ne 'STOCK COMPLETO' and existenciaCargaBean.orden ne 'UBICACION')}"
+								headerText="Fecha Despacho" width="60"
+								filterStyle="display:none" filterMatchMode="contains">
+								<h:outputText
+									value="#{of:formatDate(cont.fechaDespacho, 'dd-MM-yyyy')}" />
+							</p:column>
+						</p:dataTable>
+
+					</p:panel>
+					
+					
+					
+
+
+
+				</h:form>
+			</div>
+
+		</ui:define>
+	</ui:composition>
+
+
+</h:body>
+</html>

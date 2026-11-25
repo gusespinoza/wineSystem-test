@@ -1,0 +1,73 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:adm="http://github.com/adminfaces">
+
+<h:head></h:head>
+<body>
+
+	<p:panelGrid columns="8" layout="grid" styleClass="ui-fluid card">
+		<h:outputText for="nroBl" value="Numero Bl :  " />
+		<p:inputText id="nroBl" value="#{blBean.bl.nroBl}" />
+		<h:outputText for="nave" value="Nave : " />
+		<p:inputText id="nave" value="#{blBean.manifiesto.nave}" />
+		<h:outputText for="viaje" value="Viaje :  " />
+		<p:inputText id="viaje" value="#{blBean.bl}" />
+		<h:outputText for="tipoServicio" value="Tipo Servicio :  " />
+		<p:selectOneMenu id="tipoServicio" value="#{blBean.bl.tipoServicio}"
+			label="tipoSe">
+			<!-- 					<p:ajax listener="#{boletosBean.cargaListaParadasPorCiudadFecha()}" update=":viajesF:viajesT" /> -->
+			<f:selectItem itemLabel="Seleccione..." itemValue="0" />
+			<f:selectItems value="#{blBean.comboTipoServicio()}" var="tipoS" />
+		</p:selectOneMenu>
+	</p:panelGrid>
+	<p:panelGrid columns="8" layout="grid" styleClass="ui-fluid card">
+		<h:outputText for="condTransporte" value="Condicion de Transporte :  " />
+		<p:selectOneMenu id="condTransporte"
+			value="#{blBean.bl.condTransporte}" label="condTrans">
+			<!-- 					<p:ajax listener="#{boletosBean.cargaListaParadasPorCiudadFecha()}" update=":viajesF:viajesT" /> -->
+			<f:selectItem itemLabel="Seleccione..." itemValue="0" />
+			<f:selectItems value="#{blBean.comboCondTransporte()}" var="conTra" />
+		</p:selectOneMenu>
+
+		<h:outputText for="sentOperacion" value="Sentido Operacion :  " />
+		<p:selectOneMenu id="sentOperacion"
+			value="#{blBean.blTransporte.sentidoOperacion}" label="sentOperacion">
+			<!-- 					<p:ajax listener="#{boletosBean.cargaListaParadasPorCiudadFecha()}" update=":viajesF:viajesT" /> -->
+			<f:selectItem itemLabel="Seleccione..." itemValue="0" />
+			<f:selectItems value="#{blBean.comboSentidoOper()}" var="senOper" />
+		</p:selectOneMenu>
+
+		<h:outputText for="service" value="Services :  " />
+		<p:selectOneMenu id="service" value="#{blBean.bl.servicio}"
+			label="services">
+			<!-- 					<p:ajax listener="#{boletosBean.cargaListaParadasPorCiudadFecha()}" update=":viajesF:viajesT" /> -->
+			<f:selectItem itemLabel="Seleccione..." itemValue="0" />
+			<f:selectItems value="#{blBean.comboServices()}" var="senr" />
+		</p:selectOneMenu>
+		<h:outputText for="fechaPresent" value="Fecha Presentacion :  " />
+		<p:calendar id="fechaPresent" value="#{blBean.fechaPresentacion}"
+			pattern="MM/dd/yyyy HH:mm:ss" locale="es" />
+	</p:panelGrid>
+
+	<p:panelGrid columns="8" layout="grid" styleClass="ui-fluid card">
+		<h:outputText for="fechaEmi" value="Fecha Emision :  " />
+		<p:calendar id="fechaEmi" value="#{blBean.fechaEmision}" locale="es" />
+		<h:outputText for="fechaEmb" value="Fecha Embarque :  " />
+		<p:calendar id="fechaEmb" value="#{blBean.fechaEmbarque}" locale="es" />
+		<h:outputText for="fechaZar" value="Fecha Zarpe :  " />
+		<p:calendar id="fechaZar" value="#{blBean.fechaZarpe}" locale="es" />
+
+		<p:selectManyCheckbox id="checkSag" value="#{blBean.checkSagAforo}">
+			<f:selectItem itemLabel="Aforo" itemValue="s" />
+			<f:selectItem itemLabel="Sag" itemValue="PS4" />
+
+		</p:selectManyCheckbox>
+	</p:panelGrid>
+
+
+</body>
+</html>

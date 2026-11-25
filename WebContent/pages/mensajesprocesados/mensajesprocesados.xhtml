@@ -1,0 +1,160 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:of="http://omnifaces.org/functions"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:adm="http://github.com/adminfaces"
+	xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:pe="http://primefaces.org/ui/extensions">
+
+
+<h:head>
+	<title>Marval AEP</title>
+	<link rel="stylesheet" href="style.css"></link>
+
+</h:head>
+
+<h:body id="body">
+
+	<ui:composition template="/index.xhtml">
+
+		<ui:define name="content-begin">
+			<p:ajaxStatus onstart="PF('statusDialog').show();"
+				onsuccess="PF('statusDialog').hide();" />
+
+			<div class="ui-flat">
+
+				<h:form id="formResumen">
+
+					<f:event type="preRenderView" listener="#{mensajesProcesadosBean.onLoad()}" />
+
+					<p:panel id="msj" header="Mensajes Procesados"
+						styleClass="card no-border">
+
+						<p:panelGrid columns="5" layout="grid"
+							columnClasses="ui-grid-col-3,ui-grid-col-3,ui-grid-col-3,ui-grid-col-3,ui-grid-col-3">
+							
+							<p:selectOneMenu id="tipo"
+								value="#{mensajesProcesadosBean.tipoMensaje}"
+								style="width:100% !important" inputStyle="width:100%!important">
+								<f:selectItem itemValue="" itemLabel="TIPO MENSAJE" />
+
+
+								<f:selectItem itemValue="RECEIPT" itemLabel="RECEIPT" />
+								<f:selectItem itemValue="PURCHASEORDER"
+									itemLabel="PURCHASEORDER" />
+								<f:selectItem itemValue="PICKTICKET" itemLabel="PICKTICKET" />
+								<f:selectItem itemValue="SHIPMENT" itemLabel="SHIPMENT" />
+								<f:selectItem itemValue="INVENTORYADJUST"
+									itemLabel="INVENTORYADJUST" />
+								<f:selectItem itemValue="INVENTORYRECON"
+									itemLabel="INVENTORYRECON" />
+
+								<p:ajax event="change" process="@this" update="fechaDesde fechaHasta"></p:ajax>
+							</p:selectOneMenu>
+							
+							
+							<p:calendar id="fechaDesde" style="width:100% !important"
+								widgetVar="fechaDesdeWV" showOn="button"
+								placeholder="FECHA MENSAJE DESDE" inputStyle="width:100% !important"
+								onclick="PF('fechaDesdeWV').jqEl.datetimepicker('show');return false;"
+								value="#{mensajesProcesadosBean.fechaDesde}" pattern="dd-MM-yyyy"
+								locale="es">
+								<p:ajax event="change" update="@this" ></p:ajax>
+								
+							</p:calendar>
+
+							<p:calendar id="fechaHasta" style="width:100% !important"
+								showOn="button" inputStyle="width:100% !important"
+								widgetVar="fechaHastaWV" placeholder="FECHA HASTA"
+								onclick="PF('fechaHastaWV').jqEl.datetimepicker('show');return false;"
+								value="#{mensajesProcesadosBean.fechaHasta}" pattern="dd-MM-yyyy"
+								locale="es">
+								<p:ajax event="change" update="@this"></p:ajax>
+							</p:calendar>
+
+							
+							
+
+							<p:commandButton styleClass="btn btn-success btn-block"
+								id="buscar" value="Buscar Mensajes" process="@form"
+								icon="fa fa-search" update="mensajes"
+								actionListener="#{mensajesProcesadosBean.buscarMensajes()}">
+							</p:commandButton>
+
+						</p:panelGrid>
+
+
+					</p:panel>
+					
+					<br></br>
+					
+					
+						<p:panel id="mensajes" styleClass="card no-border"
+							visible="#{fn:length(mensajesProcesadosBean.listaMensajes) gt 0}">
+
+
+							<p:dataTable id="tablaCont" widgetVar="tablaContWV"
+								style="text-align: center;" var="cont"
+								rowIndexVar="rowId" paginator="true" 
+								rowKey="{cont.id}" 
+								emptyMessage="No existen mensajes para mostrar."
+								value="#{mensajesProcesadosBean.listaMensajes}" rows="30">
+								
+
+								<p:column width="20" headerText="#">
+									<p:outputLabel value="#{rowId + 1}" />
+								</p:column>
+								<p:column filterBy="#{cont.fechaCr}" headerText="Fecha Envío"
+									width="80" filterStyle="display:none"
+									filterMatchMode="contains">
+									<p:outputLabel
+										style="font-weight: 700;font-size: 15px;line-height: 1.0;"
+										value="#{of:formatDate(cont.fechaCr, 'dd-MM-yyyy')}" />
+								</p:column>
+								<p:column filterBy="#{cont.archivo}" headerText="Archivo"
+									width="120" filterStyle="display:none"
+									filterMatchMode="contains">
+									<p:outputLabel
+										style="font-weight: 700;font-size: 15px;line-height: 1.0;"
+										value="#{cont.archivo}" />
+								</p:column>
+
+							<p:column headerText="Acción" width="60">
+
+								<p:commandLink id="imp" global="false" process="@this"
+									actionListener="#{mensajesProcesadosBean.descargarTXT(cont)}">
+									<h:graphicImage
+										value="data:image/jpg;base64,#{constantesBean.papeleta}"
+										width="25" height="25" />
+								</p:commandLink>
+								<p:tooltip for="imp" value="descargar #{cont.archivo}"></p:tooltip>
+
+							</p:column>
+
+
+						</p:dataTable>
+
+						</p:panel>
+
+
+
+				</h:form>
+				
+				<h:form id="formDescarga">
+					<p:commandButton styleClass="btn-flat btn-primary btn-block" delay="800"
+						ajax="false" id="descargaArchivo" style="visibility: hidden;">
+						<p:fileDownload value="#{mensajesProcesadosBean.streamedContent}" />
+					</p:commandButton>
+				</h:form>
+			</div>
+
+		</ui:define>
+	</ui:composition>
+
+
+</h:body>
+</html>

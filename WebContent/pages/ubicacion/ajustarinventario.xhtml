@@ -1,0 +1,224 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:of="http://omnifaces.org/functions"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:adm="http://github.com/adminfaces"
+	xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:pe="http://primefaces.org/ui/extensions">
+
+
+<h:head>
+	<title>Marval Wine</title>
+	<link rel="stylesheet" href="style.css"></link>
+
+</h:head>
+
+<h:body id="body">
+
+	<ui:composition template="/index.xhtml">
+
+		<ui:define name="content-begin">
+			<p:ajaxStatus onstart="PF('statusDialog').show();"
+				onsuccess="PF('statusDialog').hide();" />
+
+			<div class="ui-flat">
+
+				<h:form id="formAjustar">
+
+					<f:event type="preRenderView"
+						listener="#{ajusteInventarioBean.onLoad()}" />
+
+					<p:panel id="ubicacion" header="Ajustar Inventario"
+						styleClass="card no-border">
+
+						<p:panelGrid columns="3" layout="grid"
+							columnClasses="ui-grid-col-3,ui-grid-col-3,ui-grid-col-3">
+
+							<p:autoComplete maxlength="30" placeholder="CODIGO PRODUCTO"
+								scrollHeight="200" style="width:100%;"
+								inputStyle="width:100%!important" forceSelection="false"
+								value="#{ajusteInventarioBean.producto}" minQueryLength="4"
+								completeMethod="#{ajusteInventarioBean.autoCompletarProductNumbers}"
+								effect="fade">
+								<p:ajax event="keyup" global="false" />
+								<p:ajax event="query" global="false" />
+								<p:ajax event="itemSelect" global="false" update="cosecha" />
+
+							</p:autoComplete>
+
+							<p:inputText id="cosecha" maxlength="4" placeholder="COSECHA"
+								style="width:100%;"
+								disabled="#{ajusteInventarioBean.producto eq ''}"
+								value="#{ajusteInventarioBean.cosecha}">
+								<p:ajax event="keyup" global="false" />
+								</p:inputText>
+
+							<p:commandButton styleClass="btn btn-success btn-block"
+								id="buscar" process="@this" value="Buscar" icon="fa fa-search"
+								update="ajustarRes"
+								actionListener="#{ajusteInventarioBean.buscar()}">
+							</p:commandButton>
+
+						</p:panelGrid>
+
+
+					</p:panel>
+
+					<br></br>
+
+
+					<p:panel id="ajustarRes" styleClass="card no-border"
+						visible="#{fn:length(ajusteInventarioBean.listaPos) gt 0}">
+
+						<p:dataTable id="tablaCont" widgetVar="tablaContWV"
+							style="text-align: center;" var="cont" rowIndexVar="rowId"
+							paginator="false" editable="true" rowKey="#{cont.id}"
+							editMode="cell" emptyMessage="No existen etiquetas para mostrar."
+							value="#{ajusteInventarioBean.listaPos}" rows="30">
+
+							<p:ajax event="cellEdit" global="false" process="@this"
+								update="formAjustar:confirmar"
+								listener="#{ajusteInventarioBean.editaCantidad}" />
+
+							<p:column width="45" headerText="#">
+								<p:outputLabel value="#{rowId + 1}" />
+							</p:column>
+
+							<p:column headerText="Código Producto" width="100">
+								<p:outputLabel
+									style="font-weight: 700;font-size: 15px;line-height: 1.0;"
+									value="#{cont.producto_id}" />
+							</p:column>
+
+							<p:column headerText="Viña" width="100">
+								<p:outputLabel
+									style="font-weight: 700;font-size: 15px;line-height: 1.0;"
+									value="#{cont.vina}" />
+							</p:column>
+
+							<p:column filterBy="#{cont.producto}" headerText="Producto"
+								width="120" filterStyle="display:none"
+								filterMatchMode="contains">
+								<p:outputLabel
+									style="font-weight: 700;font-size: 15px;line-height: 1.0;"
+									value="#{cont.producto}" />
+							</p:column>
+
+							<p:column headerText="Cosecha" width="80">
+								<p:outputLabel
+									style="font-weight: 700;font-size: 15px;line-height: 1.0;"
+									value="#{cont.cosecha}" />
+							</p:column>
+
+							
+							<p:column headerText="Estado Recep" width="50">
+								<p:outputLabel
+									style="font-weight: 700;font-size: 15px;line-height: 1.0;"
+									value="#{cont.estadoRecep}" />
+							</p:column>
+
+							<p:column filterBy="#{cont.stock}" headerText="Stock Completo"
+								width="60" filterStyle="display:none" filterMatchMode="contains">
+
+								<p:outputLabel
+									style="font-weight: 700;font-size: 15px;line-height: 1.0;"
+									value="#{cont.stock}" />
+							</p:column>
+							
+							
+
+							<p:column headerText="Acción" width="80">
+								<p:commandLink id="ajustar"
+									actionListener="#{ajusteInventarioBean.ajustar(cont)}"
+									oncomplete="PF('rf').show();" update="formAjustar:rfPanel">
+									<h:graphicImage
+										value="data:image/jpg;base64,#{constantesBean.editar}"
+										width="25" height="25" />
+								</p:commandLink>
+								<p:tooltip for="ajustar" value="Ajustar"></p:tooltip>
+							</p:column>
+
+						</p:dataTable>
+
+
+					</p:panel>
+
+
+					<p:remoteCommand name="mod"
+						actionListener="#{ajusteInventarioBean.modificarCantidad()}"></p:remoteCommand>
+
+
+
+					<p:dialog widgetVar="rf" modal="true" draggable="false"
+						closeOnEscape="true" position="center center" showHeader="false"
+						hideEffect="fade" showEffect="fade" resizable="false"
+						height="auto" width="80%" closable="false"
+						onShow="PF('rf').initPosition();"
+						style="background-color:#F0F0F0;" styleClass="box-success">
+						<div class="ui-flat">
+							<p:panel header="#{ajusteInventarioBean.poSel.producto}"
+								styleClass="card no-border" id="rfPanel">
+
+								<p:panelGrid columns="3" layout="grid"
+									columnClasses="ui-grid-col-4,ui-grid-col-4,ui-grid-col-4">
+									
+									<p:inputNumber decimalPlaces="0" placeholder="CANTIDAD"
+										style="width:100%;" inputStyle="width:100%;"
+										value="#{ajusteInventarioBean.poSel.cantidad}" />
+										
+									<p:selectOneMenu id="tipo"
+										value="#{ajusteInventarioBean.poSel.tipoAjuste}"
+										style="width:100% !important"
+										inputStyle="width:100%!important">
+										<f:selectItem itemValue="" itemLabel="TIPO AJUSTE +/-" />
+										<f:selectItem itemValue="+"
+											itemLabel="+" />
+										<f:selectItem itemValue="-" itemLabel="-" />
+										<p:ajax event="change" process="@this"></p:ajax>
+									</p:selectOneMenu>
+									
+									<p:selectOneMenu id="motivo"
+										value="#{ajusteInventarioBean.poSel.motivo}"
+										style="width:100% !important"
+										inputStyle="width:100%!important">
+										<f:selectItem itemValue="" itemLabel="MOTIVO AJUSTE" />
+										<f:selectItem itemValue="CUADRATURA" itemLabel="CUADRATURA" />
+										<f:selectItem itemValue="DAÑO" itemLabel="DAÑO" />
+										<f:selectItem itemValue="DESPACHO" itemLabel="DESPACHO" />
+										<p:ajax event="change" process="@this"></p:ajax>
+									</p:selectOneMenu>
+									<h:outputLabel value="" />
+
+									<p:commandButton styleClass="btn-flat btn-success"
+										style="width:100%;"
+										actionListener="#{ajusteInventarioBean.confirmarAjuste()}"
+										id="confirmar" value="Confirmar Ajuste"
+										icon="fa fa-fw fa-check">
+									</p:commandButton>
+									
+									<p:commandButton styleClass="btn-flat" style="width:100%;"
+										id="can" value="Cancelar" onclick="PF('rf').hide();habilitarScroll();"
+										icon="fa fa-close">
+									</p:commandButton>
+								</p:panelGrid>
+
+
+							</p:panel>
+						</div>
+					</p:dialog>
+
+
+
+				</h:form>
+			</div>
+
+		</ui:define>
+	</ui:composition>
+
+
+</h:body>
+</html>

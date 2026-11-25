@@ -1,0 +1,317 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:of="http://omnifaces.org/functions"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:adm="http://github.com/adminfaces"
+	xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:pe="http://primefaces.org/ui/extensions">
+
+
+<h:head>
+	<title>Marval Wine</title>
+	<link rel="stylesheet" href="style.css"></link>
+
+</h:head>
+
+<h:body id="body">
+
+	<ui:composition template="/index.xhtml">
+
+		<ui:define name="content-begin">
+			<p:ajaxStatus onstart="PF('statusDialog').show();"
+				onsuccess="PF('statusDialog').hide();" />
+
+			<div class="ui-flat">
+
+				<h:form id="formRepaletizado">
+
+					<f:event type="preRenderView"
+						listener="#{repaletizadoBean.onLoad()}" />
+
+					<p:panel id="ubicacion" header="Repaletizado"
+						styleClass="card no-border">
+
+						<p:panelGrid columns="3" layout="grid"
+							columnClasses="ui-grid-col-3,ui-grid-col-3,ui-grid-col-3">
+
+							<p:autoComplete maxlength="10" placeholder="ETIQUETA"
+								scrollHeight="200" style="width:100%;" maxResults="5"
+								inputStyle="width:100%!important"
+								value="#{repaletizadoBean.etiqueta}" minQueryLength="4"
+								completeMethod="#{repaletizadoBean.autoCompletaEtiqueta}"
+								onkeypress="if(event.which &lt; 48 || event.which &gt; 57 ) if(event.which != 8) return false;"
+								onkeyup="if(event.keyCode != 8 &amp;&amp; value.length == 4) value = value + '-'"
+								effect="fade">
+								<p:ajax event="keyup" global="false" />
+								<p:ajax event="query" global="false" />
+								<p:ajax event="itemSelect" global="false" />
+							</p:autoComplete>
+
+							<p:commandButton styleClass="btn btn-success btn-block"
+								id="buscar" process="@this" value="Buscar" icon="fa fa-search"
+								update="ubicacionRes"
+								actionListener="#{repaletizadoBean.buscar()}">
+							</p:commandButton>
+
+						</p:panelGrid>
+
+
+					</p:panel>
+
+					<br></br>
+
+
+					<p:panel id="ubicacionRes" styleClass="card no-border"
+						visible="#{fn:length(repaletizadoBean.listaEtiquetas) gt 0}">
+
+
+						<p:dataTable id="tablaCont" widgetVar="tablaContWV"
+							style="text-align: center;" var="cont" rowIndexVar="rowId"
+							paginator="false" rowKey="#{cont.id}"
+							emptyMessage="No existen etiquetas para mostrar."
+							value="#{repaletizadoBean.listaEtiquetas}" rows="30">
+
+							<p:column width="40" headerText="#">
+								<p:outputLabel value="#{rowId + 1}" />
+							</p:column>
+
+							<p:column filterBy="#{cont.etiqueta}" headerText="Etiqueta"
+								width="60" filterStyle="display:none" filterMatchMode="contains">
+								<p:outputLabel
+									style="font-weight: 700;font-size: 15px;line-height: 1.0;"
+									value="#{cont.etiqueta}" />
+							</p:column>
+
+							<p:column filterBy="#{cont.vina}" headerText="Viña" width="150"
+								filterStyle="display:none" filterMatchMode="contains">
+								<p:outputLabel
+									style="font-weight: 700;font-size: 15px;line-height: 1.0;"
+									value="#{cont.vina}" />
+							</p:column>
+
+							<p:column filterBy="#{cont.producto}" headerText="Producto"
+								width="120" filterStyle="display:none"
+								filterMatchMode="contains">
+								<p:outputLabel
+									style="font-weight: 700;font-size: 15px;line-height: 1.0;"
+									value="#{cont.producto}" />
+							</p:column>
+
+							<p:column filterBy="#{cont.lote}" headerText="Lote" width="80"
+								filterStyle="display:none" filterMatchMode="contains">
+								<p:outputLabel
+									style="font-weight: 700;font-size: 15px;line-height: 1.0;"
+									value="#{cont.lote}" />
+							</p:column>
+
+							<p:column filterBy="#{cont.cajasPallet}"
+								headerText="Cajas Por Pallet" width="80"
+								filterStyle="display:none" filterMatchMode="contains">
+								<p:outputLabel
+									style="font-weight: 700;font-size: 15px;line-height: 1.0;"
+									value="#{cont.cajasPallet}" />
+							</p:column>
+
+							<p:column filterBy="#{cont.botellasPorCaja}"
+								headerText="Botellas Por Caja" width="80"
+								filterStyle="display:none" filterMatchMode="contains">
+								<p:outputLabel
+									style="font-weight: 700;font-size: 15px;line-height: 1.0;"
+									value="#{cont.botellasPorCaja}" />
+							</p:column>
+
+							<p:column headerText="Acción" width="50">
+								<p:commandLink id="quit"
+									oncomplete="PF('dlgRepaletizado').show();bloquearScroll();"
+									process="@this" immediate="true" resetValues="true"
+									actionListener="#{repaletizadoBean.repaletizarEtiqueta(cont)}"
+									update=":formRepaletizado:panelRepaletizado">
+									<h:graphicImage
+										value="data:image/jpg;base64,#{constantesBean.eliminar}"
+										width="25" height="25" />
+								</p:commandLink>
+								<p:tooltip for="quit" value="Quitar Cajas" />
+
+							</p:column>
+						</p:dataTable>
+					</p:panel>
+
+
+
+
+					<p:dialog widgetVar="dlgRepaletizado" modal="true"
+						draggable="false" id="editarUsuarioId" showHeader="false"
+						closeOnEscape="true" position="center center"
+						style="background-color:#F0F0F0;"
+						onShow="PF('dlgRepaletizado').initPosition();" hideEffect="fade"
+						styleClass="box-success" showEffect="fade" resizable="false"
+						minHeight="150" width="70%">
+
+						<p:panel styleClass="card no-border" id="panelRepaletizado"
+							header="Movimiento de Cajas">
+
+
+							<p:panelGrid columns="4" id="panelEtiqSel"
+								columnClasses="ui-grid-col-2,ui-grid-col-4,ui-grid-col-2,ui-grid-col-4"
+								layout="grid">
+
+								<p:outputLabel for="et" value="Etiqueta Seleccionada:" />
+								<p:inputText id="et" maxlength="30"
+									onkeyup="value=value.toUpperCase()" readonly="true"
+									value="#{repaletizadoBean.repaletizadoSel.etiqueta}"
+									style="#{ component.valid ? '' : 'border-color:red;'} width:100%;" />
+
+								<p:outputLabel for="prod" value="Producto:" />
+								<p:inputText id="prod" maxlength="30"
+									onkeyup="value=value.toUpperCase()" readonly="true"
+									value="#{repaletizadoBean.repaletizadoSel.producto}"
+									style="#{ component.valid ? '' : 'border-color:red;'} width:100%;" />
+
+								<p:outputLabel for="cant" value="Cajas por Pallet:" />
+								<p:inputNumber id="cant" symbol=" /cajas" symbolPosition="right"
+									inputStyle="width:100%!important" placeholder="0"
+									decimalPlaces="0" readonly="true"
+									style="#{ component.valid ? '' : 'border-color:red;'} width:100% !important"
+									value="#{repaletizadoBean.repaletizadoSel.cajasPallet}" />
+									
+								<p:outputLabel for="slip" value="Slipsheet:" />
+								<p:selectBooleanCheckbox id="slip" value="#{repaletizadoBean.repaletizadoSel.slipsheet}" />
+
+							</p:panelGrid>
+
+							<br />
+
+
+
+							<p:outputLabel for="mov" value="Cantidad a Quitar:" />
+							<p:inputNumber id="mov" symbol=" /cajas" symbolPosition="right"
+								inputStyle="width:100%!important" placeholder="0"
+								style="#{ component.valid ? '' : 'border-color:red;'} width:100% !important"
+								value="#{repaletizadoBean.movimiento}" decimalPlaces="0" />
+
+							<br />
+							<br />
+
+							<p:outputPanel style="text-align: right;">
+								<p:commandButton styleClass="btn btn-flat btn-success"
+									value="Siguiente" icon="fa fa-fw fa-arrow-right" global="false"
+									actionListener="#{repaletizadoBean.siguiente()}"
+									oncomplete="if (args.validationFailed) validacion();"
+									style="width: 200px;height: 35px;" id="btnSiguiente"
+									update="formRepaletizado:panelRepaletizadoSec">
+								</p:commandButton>
+								&nbsp;
+								<p:commandButton styleClass="btn" value="Cancelar"
+									icon="fa fa-close" global="false"
+									onclick="PF('dlgRepaletizado').hide();habilitarScroll();"
+									style="width: 200px;height: 35px;" id="btnVolverEdit">
+								</p:commandButton>
+							</p:outputPanel>
+
+						</p:panel>
+					</p:dialog>
+
+
+
+					<p:dialog widgetVar="dlgRepaletizadoSec" modal="true"
+						draggable="false" id="editarUsuarioIdSec" showHeader="false"
+						closeOnEscape="true" position="center center"
+						style="background-color:#F0F0F0;"
+						onShow="PF('dlgRepaletizadoSec').initPosition();"
+						hideEffect="fade" styleClass="box-success" showEffect="fade"
+						resizable="false" minHeight="150" width="70%">
+
+						<p:panel styleClass="card no-border" id="panelRepaletizadoSec"
+							header="Movimiento de -#{repaletizadoBean.movimiento} cajas / Etiqueta #{repaletizadoBean.repaletizadoSel.etiqueta}">
+
+							<p:spacer height="5"></p:spacer>
+
+
+							<p:toggleSwitch id="otraeti" value="#{repaletizadoBean.etiSec}" style="margin-bottom: -5px;">
+								<p:ajax update="panelOtraEti" />
+							</p:toggleSwitch> &nbsp;
+							<p:outputLabel for="otraeti" value="Mover hacia otra etiqueta" />
+
+							<br />
+							<br />
+
+							<p:panel id="panelOtraEti" visible="#{repaletizadoBean.etiSec}">
+
+								<p:panelGrid columns="4" id="panelEtiqSel2"
+									columnClasses="ui-grid-col-2,ui-grid-col-4,ui-grid-col-2,ui-grid-col-4"
+									layout="grid">
+
+									<p:outputLabel for="et2" value="hacia la Etiqueta:" />
+									<p:autoComplete maxlength="10" id="et2" scrollHeight="200"
+										style="width:100%;" inputStyle="width:100%!important"
+										forceSelection="false"
+										value="#{repaletizadoBean.etiquetaSecun}" minQueryLength="4"
+										completeMethod="#{repaletizadoBean.autoCompletaEtiquetaSecun}"
+										onkeypress="if(event.which &lt; 48 || event.which &gt; 57 ) if(event.which != 8) return false;"
+										onkeyup="if(event.keyCode != 8 &amp;&amp; value.length == 4) value = value + '-'"
+										effect="fade">
+										<p:ajax event="keyup" global="false" />
+										<p:ajax event="query" global="false" />
+										<p:ajax event="itemSelect" global="false"
+											listener="#{repaletizadoBean.buscarEtiquetaSecundaria()}"
+											update="panelEtiqSel2" />
+									</p:autoComplete>
+
+									<p:outputLabel for="pr" value="Producto:" />
+									<p:inputText id="pr" maxlength="30" disabled="true"
+										onkeyup="value=value.toUpperCase()" readonly="true"
+										value="#{repaletizadoBean.repSecundario.producto}"
+										style="#{ component.valid ? '' : 'border-color:red;'} width:100%;" />
+
+									<p:outputLabel for="cnt" value="Cajas por Pallet:" />
+									<p:inputText id="cnt" maxlength="30" disabled="true"
+										onkeyup="value=value.toUpperCase()" readonly="true"
+										value="#{repaletizadoBean.repSecundario.cajasPallet}"
+										style="#{ component.valid ? '' : 'border-color:red;'} width:100%;" />
+										
+									<p:outputLabel for="slip2" value="Slipsheet:" />
+									<p:selectBooleanCheckbox id="slip2" value="#{repaletizadoBean.repSecundario.slipsheet}" />
+
+								</p:panelGrid>
+
+							</p:panel>
+
+							<br />
+
+							<br />
+
+							<p:outputPanel style="text-align: right;">
+								<p:commandButton styleClass="btn btn-flat btn-success"
+									value="Guardar" icon="fa fa-fw fa-check" global="false"
+									actionListener="#{repaletizadoBean.confirmar()}"
+									style="width: 200px;height: 35px;" id="btnGuardar">
+								</p:commandButton>
+								&nbsp;
+								<p:commandButton styleClass="btn" value="Cancelar"
+									icon="fa fa-close" global="false"
+									onclick="PF('dlgRepaletizadoSec').hide();habilitarScroll();"
+									style="width: 200px;height: 35px;" id="btnVolverEditSec">
+								</p:commandButton>
+							</p:outputPanel>
+
+						</p:panel>
+					</p:dialog>
+
+
+					<p:remoteCommand name="guardar" update="@form"
+						action="#{repaletizadoBean.guardar()}" />
+
+
+				</h:form>
+			</div>
+
+		</ui:define>
+	</ui:composition>
+
+
+</h:body>
+</html>
