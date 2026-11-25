@@ -6,7 +6,7 @@ info:
   description: API designed to decouple the legacy JSF UI from the business logic, allowing Angular and Go to replace the system incrementally.
   license:
     name: Proprietary
-    url: https://marval.example.com/terms
+    url: https://marval.example.com
   x-migration-phase: "phase-2-contracts"
   x-legacy-system: "wineSystem JSF/Spring/Hibernate"
   x-target-stack: "Angular + Go"
@@ -589,6 +589,112 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
+  /etiquetas/{id}/cancel:
+    post:
+      tags:
+        - existencia
+      operationId: cancelEtiqueta
+      summary: Cancel a single label
+      description: Replaces BuscarEtiquetaBean.cancelarEtiqueta(). Updates label state to CANCELADA with observation and timestamp.
+      x-source: "BuscarEtiquetaBean.cancelarEtiqueta()"
+      x-status: draft
+      x-todo: "Open question: legacy writes directly to estado=CANCELADA. Confirm if audit rules or stock reconciliation are required."
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CancelEtiquetaRequest"
+      responses:
+        "200":
+          description: Label with updated state
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ConsultarEtiqueta"
+        "400":
+          description: Missing observation or motivo
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: Missing WINE_* permission
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Label not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "409":
+          description: Label already cancelled or in a non-cancellable state
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /etiquetas/cancel-batch:
+    post:
+      tags:
+        - existencia
+      operationId: cancelEtiquetasBatch
+      summary: Cancel multiple labels in one request
+      description: Replaces BuscarEtiquetaBean.cancelarEtiquetasCheck(). Updates all selected labels to CANCELADA.
+      x-source: "BuscarEtiquetaBean.cancelarEtiquetasCheck()"
+      x-status: draft
+      x-todo: "Confirm if the batch should be transactional (all-or-nothing) or best-effort with per-item result."
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CancelEtiquetasBatchRequest"
+      responses:
+        "200":
+          description: Batch cancellation results
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CancelEtiquetasBatchResponse"
+        "400":
+          description: Empty list or missing motivo
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: Missing WINE_* permission
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "409":
+          description: One or more labels are not cancellable
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
 
 components:
   securitySchemes:
@@ -834,3 +940,62 @@ components:
       x-source: "BuscarEtiquetaBean.buscarEtiqueta()"
       x-status: draft
       x-todo: "Confirm page content and pagination fields against the dynamic native query."
+    CancelEtiquetaRequest:
+      type: object
+      required:
+        - motivo
+      x-source: "BuscarEtiquetaBean.cancelarEtiqueta()"
+      x-status: draft
+      x-todo: "Confirm motivo validation rules against the legacy observation requirement."
+      properties:
+        motivo:
+          type: string
+          minLength: 1
+          maxLength: 500
+    CancelEtiquetasBatchRequest:
+      type: object
+      required:
+        - ids
+        - motivo
+      x-source: "BuscarEtiquetaBean.cancelarEtiquetasCheck()"
+      x-status: draft
+      x-todo: "Confirm batch motivo handling against the legacy selection flow."
+      properties:
+        ids:
+          type: array
+          minItems: 1
+          maxItems: 100
+          items:
+            type: string
+        motivo:
+          type: string
+          minLength: 1
+          maxLength: 500
+    CancelEtiquetasBatchResponse:
+      type: object
+      required:
+        - requested
+        - cancelled
+        - failed
+      x-source: "BuscarEtiquetaBean.cancelarEtiquetasCheck()"
+      x-status: draft
+      x-todo: "Confirm error aggregation format with business team."
+      properties:
+        requested:
+          type: integer
+        cancelled:
+          type: integer
+        failed:
+          type: integer
+        errors:
+          type: array
+          items:
+            type: object
+            required:
+              - id
+              - reason
+            properties:
+              id:
+                type: string
+              reason:
+                type: string
