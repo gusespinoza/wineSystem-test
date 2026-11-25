@@ -4,6 +4,9 @@ info:
   title: wineSystem API
   version: 1.0.0
   description: API designed to decouple the legacy JSF UI from the business logic, allowing Angular and Go to replace the system incrementally.
+  license:
+    name: Proprietary
+    url: https://marval.example.com/terms
   x-migration-phase: "phase-2-contracts"
   x-legacy-system: "wineSystem JSF/Spring/Hibernate"
   x-target-stack: "Angular + Go"
@@ -98,6 +101,7 @@ paths:
       tags:
         - mensajes
       operationId: listMensajesProcesados
+      x-anyOf-required: [po, vina, fechaDesde]
       summary: Search processed messages
       description: Replaces MensajesProcesadosBean.buscarMensajes(). Requires at least one filter (po, vina or fechaDesde) — mirrors the legacy validation.
       x-source: "MensajesProcesadosBean.buscarMensajes()"
@@ -296,6 +300,295 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
+  /existencias:
+    get:
+      tags:
+        - existencia
+      operationId: listExistencias
+      summary: Search existing cargo by winery/order
+      description: Replaces ExistenciaCargaBean.buscarCargas(). Executes SP dbo.existencia_carga.
+      x-source: "ExistenciaCargaBean.buscarCargas()"
+      x-status: draft
+      x-todo: >-
+        Open question: SP dbo.existencia_carga internal logic is not documented.
+        Confirm what fields it returns and if it handles pagination natively or
+        needs it in the API.
+      parameters:
+        - name: vina
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: po
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: orden
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: fechaDesde
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date
+        - name: fechaHasta
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 0
+        - name: size
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 20
+            maximum: 100
+      responses:
+        "200":
+          description: Existing cargo
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ExistenciaPage"
+        "400":
+          description: orden is required
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: Missing WINE_* permission
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /existencias/autocomplete/vinas:
+    get:
+      tags:
+        - existencia
+      operationId: autocompleteVinasExistencia
+      summary: Autocomplete winery (viña) values for existencia
+      x-source: "ExistenciaCargaBean.autoCompletarVinas(valor)"
+      x-status: draft
+      x-todo: "Legacy autocomplete returns null on error; confirm equivalent API error behavior."
+      parameters:
+        - name: q
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 10
+      responses:
+        "200":
+          description: Matching winery values
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/AutocompleteItem"
+        "400":
+          description: Invalid query parameters
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /existencias/autocomplete/pos:
+    get:
+      tags:
+        - existencia
+      operationId: autocompletePosExistencia
+      summary: Autocomplete PO values for existencia
+      x-source: "ExistenciaCargaBean.autocompletarPOS(valor)"
+      x-status: draft
+      x-todo: "Legacy autocomplete returns null on error; confirm equivalent API error behavior."
+      parameters:
+        - name: q
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 10
+      responses:
+        "200":
+          description: Matching PO values
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/AutocompleteItem"
+        "400":
+          description: Invalid query parameters
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /existencias/export:
+    get:
+      tags:
+        - existencia
+      operationId: exportExistenciasExcel
+      summary: Export existing cargo as Excel (.xls)
+      description: Replaces generarExcelExistencia(). Generates an Excel file server-side (legacy uses ReporteExcel).
+      x-source: "ExistenciaCargaBean.generarExcelExistencia()"
+      x-status: draft
+      x-todo: "Legacy uses JExcel/POI. Confirm if the new API should generate it on the fly (streaming) or delegate to a background job."
+      parameters:
+        - name: vina
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: po
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: orden
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: fechaDesde
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date
+        - name: fechaHasta
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date
+      responses:
+        "200":
+          description: Excel file stream
+          content:
+            application/vnd.ms-excel:
+              schema:
+                type: string
+                format: binary
+        "400":
+          description: Invalid query parameters
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: Missing WINE_* permission
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /etiquetas:
+    get:
+      tags:
+        - existencia
+      operationId: searchEtiquetas
+      summary: Search labels (consulta de etiqueta)
+      description: Replaces BuscarEtiquetaBean.buscarEtiqueta(). Uses a dynamic native query.
+      x-source: "BuscarEtiquetaBean.buscarEtiqueta()"
+      x-status: draft
+      x-todo: "The bean generates QR text in memory. Confirm if the new API should return the QR payload or just the label data."
+      parameters:
+        - name: nroEtiqueta
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: vina
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: tipo
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: numero
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 0
+        - name: size
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 20
+      responses:
+        "200":
+          description: Matching labels
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ConsultarEtiquetaPage"
+        "400":
+          description: Invalid query parameters
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
 
 components:
   securitySchemes:
@@ -460,3 +753,84 @@ components:
           type: integer
         totalPages:
           type: integer
+    Existencia:
+      type: object
+      required:
+        - id
+      x-source: "Existencia entity"
+      x-status: draft
+      x-todo: "Confirm exact fields returned by dbo.existencia_carga."
+      properties:
+        id:
+          type: string
+        vina:
+          type: string
+        po:
+          type: string
+        orden:
+          type: string
+        fecha:
+          type: string
+          format: date-time
+        cantidad:
+          type: integer
+    ExistenciaPage:
+      allOf:
+        - $ref: "#/components/schemas/Pagination"
+        - type: object
+          required:
+            - content
+          properties:
+            content:
+              type: array
+              items:
+                $ref: "#/components/schemas/Existencia"
+      x-source: "ExistenciaCargaBean.buscarCargas()"
+      x-status: draft
+      x-todo: "Confirm page content and pagination fields against dbo.existencia_carga."
+    ConsultarEtiqueta:
+      type: object
+      required:
+        - id
+        - nroEtiqueta
+        - estado
+      x-source: "ConsultarEtiqueta entity"
+      x-status: draft
+      x-todo: "Confirm exact label states and whether qrPayload should be generated by the API or the frontend."
+      properties:
+        id:
+          type: string
+        nroEtiqueta:
+          type: string
+        estado:
+          type: string
+          enum:
+            - ALMACENADA
+            - RECEPCIONADA
+            - CANCELADA
+            - REPALETIZADA
+            - CONSOLIDADA
+            - DESPACHADA
+        vina:
+          type: string
+          nullable: true
+        po:
+          type: string
+          nullable: true
+        qrPayload:
+          type: string
+          nullable: true
+    ConsultarEtiquetaPage:
+      allOf:
+        - $ref: "#/components/schemas/Pagination"
+        - type: object
+          required:
+            - content
+          properties:
+            content:
+              type: array
+              items:
+                $ref: "#/components/schemas/ConsultarEtiqueta"
+      x-source: "BuscarEtiquetaBean.buscarEtiqueta()"
+      x-status: draft
+      x-todo: "Confirm page content and pagination fields against the dynamic native query."
