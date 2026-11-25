@@ -21,13 +21,14 @@ Para actualizarlo, analice un módulo a la vez y complete sus relaciones, invent
 | despacho | 🟡 in progress | TBD | 2026-11-25 |
 | ubicacion | 🟡 in progress | TBD | 2026-11-25 |
 | manifiesto | 🟡 in progress | TBD | 2026-11-25 |
-| mensajes | 🟡 in progress | TBD | TBD |
+| mensajes | 🟡 in progress | TBD | 2026-11-25 |
 | existencia | 🟡 in progress | TBD | 2026-11-25 |
 | repaletizado | 🟡 in progress | TBD | 2026-11-25 |
 | facturacion | 🟡 in progress | TBD | 2026-11-25 |
 | cargaWine | 🟡 in progress | TBD | 2026-11-25 |
 | login | 🟡 in progress | TBD | 2026-11-25 |
 | contenedor | 🟡 in progress | TBD | 2026-11-25 |
+| manifiesto | 🔴 blocked | TBD | 2026-11-25 | beans not in source tree |
 
 ## Mensajes Procesados
 
@@ -309,6 +310,7 @@ Includes AsignacionBean (pages/asignacion/asignacion.xhtml, route /asignacion).
 - Confirm whether any SOAP service is invoked for AXIS/customs manifest submission; no call is visible in current source.
 - Cross-module impact with Contenedor and Recepcion is likely, but exact stored data and synchronization require the missing bean/service.
 - Confirm whether `/manifiesto` and `/manual` routes exist outside `pretty-config.xml` or are incomplete screens.
+- 🔴 BLOCKER: `manifiestoBean` y `blBean` NO existen en `src/main/java/com/marval/wine/bean`. El inventario no puede completarse por análisis estático. Próximo paso: descompilar `SEG_USUMARVAL-*.jar` o localizar la rama de código perdida.
 
 ## Existencia y Etiquetado
 
