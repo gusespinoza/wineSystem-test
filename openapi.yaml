@@ -695,6 +695,285 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
+  /ubicacion/etiquetas:
+    get:
+      tags:
+        - ubicacion
+      operationId: listEtiquetasUbicacion
+      summary: Search labels by location or ID
+      description: Replaces UbicacionBean.buscar(). Native SQL joining label/PO/detail.
+      x-source: "UbicacionBean.buscar()"
+      x-status: draft
+      x-todo: "Confirm the exact fields returned by the native label/PO/detail query."
+      parameters:
+        - name: nroEtiqueta
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: pasillo
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: altura
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: posicion
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 0
+        - name: size
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 20
+            maximum: 100
+      responses:
+        "200":
+          description: Labels matching the location or ID filters
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UbicacionEtiquetaPage"
+        "400":
+          description: Invalid query parameters
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: Missing WINE_* permission
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /ubicacion/autocomplete/etiquetas-almacenadas:
+    get:
+      tags:
+        - ubicacion
+      operationId: autocompleteEtiquetasAlmacenadas
+      summary: Autocomplete stored labels
+      x-source: "UbicacionBean.autoCompletaEtiquetaAlm(valor)"
+      x-status: draft
+      x-todo: "Legacy autocomplete returns null on exception; confirm equivalent API error behavior."
+      parameters:
+        - name: q
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 10
+      responses:
+        "200":
+          description: Matching stored labels
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/AutocompleteItem"
+        "400":
+          description: Invalid query parameters
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /ubicacion/autocomplete/etiquetas-recibidas:
+    get:
+      tags:
+        - ubicacion
+      operationId: autocompleteEtiquetasRecibidas
+      summary: Autocomplete received labels
+      x-source: "UbicacionBean.autoCompletaEtiquetaRecep(valor)"
+      x-status: draft
+      x-todo: "Legacy autocomplete returns null on exception; confirm equivalent API error behavior."
+      parameters:
+        - name: q
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 10
+      responses:
+        "200":
+          description: Matching received labels
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/AutocompleteItem"
+        "400":
+          description: Invalid query parameters
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /ajuste-inventario/pos:
+    get:
+      tags:
+        - ubicacion
+      operationId: searchAjusteInventarioPos
+      summary: Search POs for inventory adjustment
+      description: Replaces AjusteInventarioBean.buscar(). Uses SP dbo.buscar_pos.
+      x-source: "AjusteInventarioBean.buscar()"
+      x-status: draft
+      x-todo: "Open question: SP dbo.buscar_pos details are not in the source tree. Confirm fields returned."
+      parameters:
+        - name: productNumber
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 0
+        - name: size
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 20
+            maximum: 100
+      responses:
+        "200":
+          description: Matching purchase orders for adjustment
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PoAjustePage"
+        "400":
+          description: Invalid query parameters
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /ajuste-inventario/autocomplete/product-numbers:
+    get:
+      tags:
+        - ubicacion
+      operationId: autocompleteProductNumbers
+      summary: Autocomplete product numbers for adjustment
+      x-source: "AjusteInventarioBean.autoCompletarProductNumbers(valor)"
+      x-status: draft
+      x-todo: "Legacy autocomplete returns null on exception; confirm equivalent API error behavior."
+      parameters:
+        - name: q
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 10
+      responses:
+        "200":
+          description: Matching product numbers
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/AutocompleteItem"
+        "400":
+          description: Invalid query parameters
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /asignacion/contenedores-disponibles:
+    get:
+      tags:
+        - ubicacion
+      operationId: listContenedoresDisponibles
+      summary: List containers available for assignment
+      x-source: "AsignacionBean.cargarContenedores()"
+      x-status: draft
+      x-todo: "Confirm the available-container criteria exposed by ContainerService.listarContenedoresDisponibles()."
+      parameters:
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 0
+        - name: size
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 20
+            maximum: 100
+      responses:
+        "200":
+          description: Available containers
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ContenedorPage"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
 
 components:
   securitySchemes:
@@ -999,3 +1278,110 @@ components:
                 type: string
               reason:
                 type: string
+    UbicacionEtiqueta:
+      type: object
+      required:
+        - id
+        - nroEtiqueta
+      x-source: "Ubicacion entity"
+      x-status: draft
+      x-todo: "Confirm exact fields returned by the native label/PO/detail query."
+      properties:
+        id:
+          type: string
+        nroEtiqueta:
+          type: string
+        pasillo:
+          type: string
+          nullable: true
+        altura:
+          type: string
+          nullable: true
+        posicion:
+          type: string
+          nullable: true
+        estado:
+          type: string
+          enum:
+            - ALMACENADA
+            - RECEPCIONADA
+    UbicacionEtiquetaPage:
+      allOf:
+        - $ref: "#/components/schemas/Pagination"
+        - type: object
+          required:
+            - content
+          properties:
+            content:
+              type: array
+              items:
+                $ref: "#/components/schemas/UbicacionEtiqueta"
+      x-source: "UbicacionBean.buscar()"
+      x-status: draft
+      x-todo: "Confirm page content and pagination fields against the native query."
+    PoAjuste:
+      type: object
+      required:
+        - po
+        - productNumber
+      x-source: "PoAjuste entity"
+      x-status: draft
+      x-todo: "Confirm exact fields from dbo.buscar_pos."
+      properties:
+        po:
+          type: string
+        productNumber:
+          type: string
+        cantidad:
+          type: integer
+    PoAjustePage:
+      allOf:
+        - $ref: "#/components/schemas/Pagination"
+        - type: object
+          required:
+            - content
+          properties:
+            content:
+              type: array
+              items:
+                $ref: "#/components/schemas/PoAjuste"
+      x-source: "AjusteInventarioBean.buscar()"
+      x-status: draft
+      x-todo: "Confirm page content and pagination fields from dbo.buscar_pos."
+    Contenedor:
+      type: object
+      required:
+        - id
+        - numero
+      x-source: "Container entity"
+      x-status: draft
+      x-todo: "Confirm the fields returned by ContainerService.listarContenedoresDisponibles()."
+      properties:
+        id:
+          type: string
+        numero:
+          type: string
+        estado:
+          type: string
+          enum:
+            - DISPONIBLE
+            - ASIGNADO
+            - CONSOLIDADO
+            - DESPACHADO
+        sello:
+          type: string
+          nullable: true
+    ContenedorPage:
+      allOf:
+        - $ref: "#/components/schemas/Pagination"
+        - type: object
+          required:
+            - content
+          properties:
+            content:
+              type: array
+              items:
+                $ref: "#/components/schemas/Contenedor"
+      x-source: "AsignacionBean.cargarContenedores()"
+      x-status: draft
+      x-todo: "Confirm page content and pagination fields against ContainerService.listarContenedoresDisponibles()."
