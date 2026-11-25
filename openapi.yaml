@@ -50,7 +50,49 @@ tags:
     description: "BLOCKED - do not generate endpoints for this tag yet"
     x-source: "manifiestoBean, blBean (source missing)"
 
-paths: {}
+paths:
+  /auth/login:
+    post:
+      tags:
+        - auth
+      operationId: login
+      summary: Authenticate a user and return a JWT
+      description: Replaces LoginBean.login(). Delegates credential validation to the legacy SEG_USUMARVAL service until Phase 3 (Go) is implemented.
+      security: []
+      x-source: "LoginBean.login()"
+      x-status: draft
+      x-todo: "confirm exact request and response contract against the legacy SEG service"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginRequest"
+      responses:
+        "200":
+          description: Authentication successful
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LoginResponse"
+        "400":
+          description: Request validation failed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Bad credentials
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: User has no company or permissions
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
 
 components:
   securitySchemes:
@@ -59,6 +101,78 @@ components:
       scheme: bearer
       bearerFormat: JWT
   schemas:
+    LoginRequest:
+      type: object
+      required:
+        - username
+        - password
+        - company
+      x-source: "LoginBean.login()"
+      x-status: draft
+      x-todo: "confirm request fields against the legacy SEG service"
+      properties:
+        username:
+          type: string
+          minLength: 1
+        password:
+          type: string
+          format: password
+          minLength: 1
+        company:
+          type: string
+          enum:
+            - SEAPORT
+          x-todo: "confirm other companies"
+    LoginResponse:
+      type: object
+      required:
+        - token
+        - tokenType
+        - expiresIn
+        - user
+      x-source: "LoginBean.login()"
+      x-status: draft
+      x-todo: "confirm token lifetime and response fields against the legacy SEG service"
+      properties:
+        token:
+          type: string
+        tokenType:
+          type: string
+          enum:
+            - Bearer
+        expiresIn:
+          type: integer
+          description: Token lifetime in seconds
+        user:
+          type: object
+          required:
+            - id
+            - username
+            - displayName
+            - role
+            - permissions
+          x-source: "LoginBean.login()"
+          x-status: draft
+          x-todo: "confirm user fields against the legacy SEG service"
+          properties:
+            id:
+              type: string
+            username:
+              type: string
+            displayName:
+              type: string
+            role:
+              type: string
+            permissions:
+              type: array
+              items:
+                type: string
+              example:
+                - WINE_ADMIN
+                - WINE_JEFEX
+                - WINE_TARJA
+                - WINE_ALMA
+              x-todo: "confirm exact permission IDs from Open questions in DESACOPLE.md#login"
     ErrorResponse:
       type: object
       required:
