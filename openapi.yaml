@@ -974,6 +974,234 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
+  /ubicacion/etiquetas/{id}:
+    put:
+      tags:
+        - ubicacion
+      operationId: updateEtiquetaUbicacion
+      summary: Update label location (reubicacion)
+      description: Replaces UbicacionBean.modificarUbicacion(). Updates pasillo, altura and posicion of a single label.
+      x-source: "UbicacionBean.modificarUbicacion()"
+      x-status: draft
+      x-todo: "Open question: position collision validation is disabled in UbicacionServiceImpl. Confirm if the new API must enforce occupied locations."
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateUbicacionRequest"
+      responses:
+        "200":
+          description: Label with updated location
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UbicacionEtiqueta"
+        "400":
+          description: Missing location fields
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: Missing WINE_* permission
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Label not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "409":
+          description: Position occupied; pending confirmation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /ubicacion/asignar:
+    post:
+      tags:
+        - ubicacion
+      operationId: assignUbicacion
+      summary: Assign location to a received label
+      description: Replaces UbicacionBean.guardarAsignacion(). Updates location and label state to ALMACENADA.
+      x-source: "UbicacionBean.guardarAsignacion()"
+      x-status: draft
+      x-todo: >-
+        Open question: guardarAsignacion() performs location UPDATE and
+        label-state UPDATE through separate service calls with no visible outer
+        transaction. Confirm if the new API must wrap them atomically.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AssignUbicacionRequest"
+      responses:
+        "200":
+          description: Label with assigned location and updated state
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UbicacionEtiqueta"
+        "400":
+          description: Missing label or location fields
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: Missing WINE_* permission
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Label not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "409":
+          description: Label already stored or position occupied
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /ajuste-inventario:
+    post:
+      tags:
+        - ubicacion
+      operationId: createAjusteInventario
+      summary: Apply an inventory adjustment
+      description: Replaces AjusteInventarioBean.modificarCantidad(). Persists a new ajuste_inventario record.
+      x-source: "AjusteInventarioBean.modificarCantidad()"
+      x-status: draft
+      x-todo: >-
+        Open question: legacy saves AjusteInventario but the PO quantity update
+        and FTP/SFTP message upload are commented. Confirm the actual source of
+        stock changes and whether the new API must also update
+        purchase_order_detalle.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateAjusteInventarioRequest"
+      responses:
+        "200":
+          description: Inventory adjustment created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AjusteInventario"
+        "400":
+          description: Missing quantity, sign or reason
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: Missing WINE_* permission
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: PO not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "409":
+          description: Stock would become negative; pending confirmation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /asignacion:
+    post:
+      tags:
+        - ubicacion
+      operationId: createAsignacion
+      summary: Assign labels to a container
+      description: Replaces AsignacionBean.asignarContenedor() + guardarAsignaciones(). Updates label/container assignment and sets container state to ASIGNADO.
+      x-source: "AsignacionBean.asignarContenedor(), AsignacionBean.guardarAsignaciones()"
+      x-status: draft
+      x-todo: >-
+        Open question: label state is set before saving assignment rows; confirm
+        rollback between etiqueta update and asignacion insert. Also confirm
+        if capacity validation (errorNumPallet) is missing.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateAsignacionRequest"
+      responses:
+        "200":
+          description: Container assignment results
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CreateAsignacionResponse"
+        "400":
+          description: Missing container or labels
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: Missing WINE_* permission
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Container or labels not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "409":
+          description: Container not available or label already assigned
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
 
 components:
   securitySchemes:
@@ -1385,3 +1613,137 @@ components:
       x-source: "AsignacionBean.cargarContenedores()"
       x-status: draft
       x-todo: "Confirm page content and pagination fields against ContainerService.listarContenedoresDisponibles()."
+    UpdateUbicacionRequest:
+      type: object
+      required:
+        - pasillo
+        - altura
+        - posicion
+      x-source: "UbicacionBean.modificarUbicacion()"
+      x-status: draft
+      x-todo: "Confirm required location field validation against UbicacionServiceImpl."
+      properties:
+        pasillo:
+          type: string
+          minLength: 1
+        altura:
+          type: string
+          minLength: 1
+        posicion:
+          type: string
+          minLength: 1
+    AssignUbicacionRequest:
+      type: object
+      required:
+        - nroEtiqueta
+        - pasillo
+        - altura
+        - posicion
+      x-source: "UbicacionBean.guardarAsignacion()"
+      x-status: draft
+      x-todo: "Confirm label and location field validation against guardarAsignacion()."
+      properties:
+        nroEtiqueta:
+          type: string
+          minLength: 1
+        pasillo:
+          type: string
+          minLength: 1
+        altura:
+          type: string
+          minLength: 1
+        posicion:
+          type: string
+          minLength: 1
+    CreateAjusteInventarioRequest:
+      type: object
+      required:
+        - po
+        - productNumber
+        - cantidad
+        - motivo
+      x-source: "AjusteInventarioBean.modificarCantidad()"
+      x-status: draft
+      x-todo: "Confirm quantity sign and reason semantics against the legacy adjustment flow."
+      properties:
+        po:
+          type: string
+        productNumber:
+          type: string
+        cantidad:
+          type: integer
+          description: "positive=increase, negative=decrease"
+        motivo:
+          type: string
+          minLength: 1
+          maxLength: 500
+    AjusteInventario:
+      type: object
+      required:
+        - id
+        - po
+        - productNumber
+        - cantidad
+        - fecha
+      x-source: "AjusteInventario entity"
+      x-status: draft
+      x-todo: "Confirm exact adjustment fields against the persisted entity."
+      properties:
+        id:
+          type: string
+        po:
+          type: string
+        productNumber:
+          type: string
+        cantidad:
+          type: integer
+        motivo:
+          type: string
+        fecha:
+          type: string
+          format: date-time
+    CreateAsignacionRequest:
+      type: object
+      required:
+        - contenedorId
+        - etiquetas
+      x-source: "AsignacionBean.asignarContenedor()"
+      x-status: draft
+      x-todo: "Confirm whether etiquetas values are label IDs or label numbers."
+      properties:
+        contenedorId:
+          type: string
+        etiquetas:
+          type: array
+          minItems: 1
+          maxItems: 500
+          items:
+            type: string
+    CreateAsignacionResponse:
+      type: object
+      required:
+        - contenedorId
+        - asignadas
+        - fallidas
+      x-source: "AsignacionBean.guardarAsignaciones()"
+      x-status: draft
+      x-todo: "Confirm the assignment result and error aggregation format with the business team."
+      properties:
+        contenedorId:
+          type: string
+        asignadas:
+          type: integer
+        fallidas:
+          type: integer
+        errores:
+          type: array
+          items:
+            type: object
+            required:
+              - nroEtiqueta
+              - reason
+            properties:
+              nroEtiqueta:
+                type: string
+              reason:
+                type: string
